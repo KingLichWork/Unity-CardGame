@@ -11,9 +11,7 @@ public class CardInfoScript : MonoBehaviour
     public GameObject CardBack;
     public GameObject PointObject;
     public GameObject ShadowCard;
-    public GameObject ShadowPoint;
     public GameObject DestroyGameObject;
-
 
     public Image Image;
     public Image ImageEdge1;
@@ -61,7 +59,6 @@ public class CardInfoScript : MonoBehaviour
         CardBack.SetActive(false);
         PointObject.SetActive(true);
         ShadowCard.SetActive(true);
-        ShadowPoint.SetActive(true);
         IsHideCard = false;
         Point.text = card.BaseCard.Points.ToString();
         Name.text = card.BaseCard.Name.ToString();
@@ -114,7 +111,6 @@ public class CardInfoScript : MonoBehaviour
         CardBack.SetActive(true);
         PointObject.SetActive(false);
         ShadowCard.SetActive(false);
-        ShadowPoint.SetActive(false);
         IsHideCard = true;
     }
 
