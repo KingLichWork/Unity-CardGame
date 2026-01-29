@@ -200,132 +200,51 @@ public class CardView : MonoBehaviour, IPointerClickHandler
     {
         int countStatuseffects = 0;
 
-        if (card.SelfCard.UniqueMechanics.DestroyCardPoints != 0)
-        {
-            StatusEffectDescriptionList[0].SetActive(true);
-            countStatuseffects++;
-        }
-        else
-            StatusEffectDescriptionList[0].SetActive(false);
+        StatusEffectDescriptionList[0].SetActive(card.SelfCard.UniqueMechanics.DestroyCardPoints != 0);
 
-        if (card.SelfCard.BoostOrDamage.Damage > 0 || card.SelfCard.BoostOrDamage.SelfDamage > 0 || card.SelfCard.EndTurnActions.EndTurnNearDamage > 0 || card.SelfCard.EndTurnActions.EndTurnRandomDamage > 0 || card.SelfCard.EndTurnActions.EndTurnSelfDamage > 0)
-        {
-            StatusEffectDescriptionList[1].SetActive(true);
-            countStatuseffects++;
-        }
-        else
-            StatusEffectDescriptionList[1].SetActive(false);
+        StatusEffectDescriptionList[1].SetActive(card.SelfCard.BoostOrDamage.Damage > 0 || 
+            card.SelfCard.BoostOrDamage.SelfDamage > 0 || card.SelfCard.EndTurnActions.EndTurnNearDamage > 0 || 
+            card.SelfCard.EndTurnActions.EndTurnRandomDamage > 0 || card.SelfCard.EndTurnActions.EndTurnSelfDamage > 0);
 
-        if (card.SelfCard.BoostOrDamage.Boost > 0 || card.SelfCard.BoostOrDamage.SelfBoost > 0 || card.SelfCard.EndTurnActions.EndTurnNearBoost > 0 || card.SelfCard.EndTurnActions.EndTurnRandomBoost > 0 || card.SelfCard.EndTurnActions.EndTurnSelfBoost > 0)
-        {
-            StatusEffectDescriptionList[2].SetActive(true);
-            countStatuseffects++;
-        }
-        else
-            StatusEffectDescriptionList[2].SetActive(false);
+        StatusEffectDescriptionList[2].SetActive(card.SelfCard.BoostOrDamage.Boost > 0 || 
+            card.SelfCard.BoostOrDamage.SelfBoost > 0 || card.SelfCard.EndTurnActions.EndTurnNearBoost > 0 || 
+            card.SelfCard.EndTurnActions.EndTurnRandomBoost > 0 || card.SelfCard.EndTurnActions.EndTurnSelfBoost > 0);
 
-        if (card.SelfCard.Spawns.SpawnCardCount > 0)
-        {
-            StatusEffectDescriptionList[3].SetActive(true);
-            countStatuseffects++;
-        }
-        else
-            StatusEffectDescriptionList[3].SetActive(false);
+        StatusEffectDescriptionList[3].SetActive(card.SelfCard.Spawns.SpawnCardCount > 0);
 
-        if (card.SelfCard.DrawCard.DrawCardCount > 0)
-        {
-            StatusEffectDescriptionList[4].SetActive(true);
-            countStatuseffects++;
-        }
-        else
-            StatusEffectDescriptionList[4].SetActive(false);
+        StatusEffectDescriptionList[4].SetActive(card.SelfCard.DrawCard.DrawCardCount > 0);
 
-        if (card.SelfCard.BoostOrDamage.NearDamage > 0 || card.SelfCard.BoostOrDamage.NearBoost > 0 || card.SelfCard.EndTurnActions.EndTurnNearDamage > 0 || card.SelfCard.EndTurnActions.EndTurnNearBoost > 0)
-        {
-            StatusEffectDescriptionList[5].SetActive(true);
-            countStatuseffects++;
-        }
-        else
-            StatusEffectDescriptionList[5].SetActive(false);
+        StatusEffectDescriptionList[5].SetActive(card.SelfCard.BoostOrDamage.NearDamage > 0 || card.SelfCard.BoostOrDamage.NearBoost > 0 
+            || card.SelfCard.EndTurnActions.EndTurnNearDamage > 0 || card.SelfCard.EndTurnActions.EndTurnNearBoost > 0);
+        StatusEffectDescriptionList[6].SetActive(card.SelfCard.BaseCard.ArmorPoints > 0);
 
-        if (card.SelfCard.BaseCard.ArmorPoints > 0)
-        {
-            StatusEffectDescriptionList[6].SetActive(true);
-            countStatuseffects++;
-        }
-        else
-            StatusEffectDescriptionList[6].SetActive(false);
+        StatusEffectDescriptionList[7].SetActive(card.SelfCard.StatusEffects.IsStunOther || card.SelfCard.StatusEffects.IsSelfStunned);
 
-        if (card.SelfCard.StatusEffects.IsStunOther || card.SelfCard.StatusEffects.IsSelfStunned)
-        {
-            StatusEffectDescriptionList[7].SetActive(true);
-            countStatuseffects++;
-        }
-        else
-            StatusEffectDescriptionList[7].SetActive(false);
+        StatusEffectDescriptionList[8].SetActive(card.SelfCard.StatusEffects.IsSelfShielded || card.SelfCard.StatusEffects.IsShieldOther);
 
-        if (card.SelfCard.StatusEffects.IsSelfShielded || card.SelfCard.StatusEffects.IsShieldOther)
-        {
-            StatusEffectDescriptionList[8].SetActive(true);
-            countStatuseffects++;
-        }
-        else
-            StatusEffectDescriptionList[8].SetActive(false);
+        StatusEffectDescriptionList[9].SetActive(card.SelfCard.StatusEffects.IsIllusion || card.SelfCard.Spawns.SpawnCardName == "self");
 
-        if (card.SelfCard.StatusEffects.IsIllusion || card.SelfCard.Spawns.SpawnCardName == "self")
-        {
-            StatusEffectDescriptionList[9].SetActive(true);
-            countStatuseffects++;
-        }
-        else
-            StatusEffectDescriptionList[9].SetActive(false);
+        StatusEffectDescriptionList[10].SetActive(card.SelfCard.StatusEffects.IsInvisibility);
 
-        if (card.SelfCard.StatusEffects.IsInvisibility)
-        {
-            StatusEffectDescriptionList[10].SetActive(true);
-            countStatuseffects++;
-        }
-        else
-            StatusEffectDescriptionList[10].SetActive(false);
+        StatusEffectDescriptionList[11].SetActive(card.SelfCard.StatusEffects.IsInvulnerability);
 
-        if (card.SelfCard.StatusEffects.IsInvulnerability)
-        {
-            StatusEffectDescriptionList[11].SetActive(true);
-            countStatuseffects++;
-        }
-        else
-            StatusEffectDescriptionList[11].SetActive(false);
+        StatusEffectDescriptionList[12].SetActive(card.SelfCard.StatusEffects.SelfEnduranceOrBleeding < 0 || card.SelfCard.StatusEffects.EnduranceOrBleedingOther < 0);
 
-        if (card.SelfCard.StatusEffects.SelfEnduranceOrBleeding < 0 || card.SelfCard.StatusEffects.EnduranceOrBleedingOther < 0)
-        {
-            StatusEffectDescriptionList[12].SetActive(true);
-            countStatuseffects++;
-        }
-        else
-            StatusEffectDescriptionList[12].SetActive(false);
+        StatusEffectDescriptionList[13].SetActive(card.SelfCard.StatusEffects.SelfEnduranceOrBleeding > 0 || card.SelfCard.StatusEffects.EnduranceOrBleedingOther > 0);
 
-        if (card.SelfCard.StatusEffects.SelfEnduranceOrBleeding > 0 || card.SelfCard.StatusEffects.EnduranceOrBleedingOther > 0)
-        {
-            StatusEffectDescriptionList[13].SetActive(true);
-            countStatuseffects++;
-        }
-        else
-            StatusEffectDescriptionList[13].SetActive(false);
+        StatusEffectDescriptionList[14].SetActive(card.SelfCard.EndTurnActions.Timer > 0);
 
-        if (card.SelfCard.EndTurnActions.Timer > 0)
+        foreach (var statuseffect in StatusEffectDescriptionList)
         {
-            StatusEffectDescriptionList[14].SetActive(true);
-            countStatuseffects++;
+            if (statuseffect.activeInHierarchy)
+                countStatuseffects++;
         }
-        else
-            StatusEffectDescriptionList[14].SetActive(false);
-
 
         int height = (countStatuseffects * 200 + (countStatuseffects - 1) * 20) + 20;
 
         if (height > 780)
         {
-            CardViewDescriptionParent.GetComponent<RectTransform>().sizeDelta = new Vector2(CardViewDescriptionParent.GetComponent<RectTransform>().sizeDelta.x, height / 2);
+            CardViewDescriptionParent.GetComponent<RectTransform>().sizeDelta = new Vector2(CardViewDescriptionParent.GetComponent<RectTransform>().sizeDelta.x, height);
             CardViewDescriptionView.verticalScrollbar.value = 1;
         }
         else

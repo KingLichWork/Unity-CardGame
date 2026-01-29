@@ -51,6 +51,20 @@ public class DeckBuildManager : MonoBehaviour
         }
     }
 
+    private void OnEnable()
+    {
+        DeckBuildUI.RandomDeckAction += RandomDeck;
+        DeckBuildUI.ClearDeckAction += ClearDeck;
+        DeckBuildUI.PlayAction += Play;
+    }
+
+    private void OnDisable()
+    {
+        DeckBuildUI.RandomDeckAction -= RandomDeck;
+        DeckBuildUI.ClearDeckAction -= ClearDeck;
+        DeckBuildUI.PlayAction -= Play;
+    }
+
     private void Start()
     {
         _needCountCard.text = "/ " + _needCountCardInDeck.ToString();
@@ -91,14 +105,12 @@ public class DeckBuildManager : MonoBehaviour
         GameObject newCardInDeck = Instantiate(_cardInDeckPref, Vector3.zero, Quaternion.identity, _deckGameObject.transform);
         newCardInDeck.transform.position = new Vector3(0, 0, 100);
 
-        ClickCardOnDeckBuild click = newCardInDeck.AddComponent<ClickCardOnDeckBuild>();
+        ClickCardOnDeckBuild click = newCardInDeck.GetComponent<ClickCardOnDeckBuild>();
         click.IsInDeck = true;
         click.CardInfoScript = card;
 
         CardInDeck cardInDeck = newCardInDeck.GetComponent<CardInDeck>();
-        cardInDeck.Image.sprite = card.SelfCard.BaseCard.Sprite;
-        cardInDeck.Name.text = card.Name.text + ": " + card.SecondName.text;
-        cardInDeck.Points.text = card.Point.text;
+        cardInDeck.SetInfo(card.Name.text + ": " + card.SecondName.text, card.Point.text, card.SelfCard.BaseCard.Sprite);
 
         _deck.Add(card.SelfCard);
 
@@ -126,7 +138,7 @@ public class DeckBuildManager : MonoBehaviour
             _deckGameObject.GetComponent<RectTransform>().sizeDelta = new Vector2(_deckGameObject.GetComponent<RectTransform>().sizeDelta.x, height);
     }
 
-    public void StartGame()
+    private void Play()
     {
         if (_countCardInDeck == _needCountCardInDeck)
         {
@@ -135,7 +147,7 @@ public class DeckBuildManager : MonoBehaviour
         }
     }
 
-    public void RandomDeck()
+    private void RandomDeck()
     {
         _randomDeckList = new List<CardInfoScript>(_cardInfoDeckList);
         int currentCardInDeck = _countCardInDeck;
@@ -173,12 +185,7 @@ public class DeckBuildManager : MonoBehaviour
         }
     }
 
-    public void Exit()
-    {
-        SceneManager.LoadScene("Menu");
-    }
-
-    public void ClearDeck()
+    private void ClearDeck()
     {
         _countCardInDeck = 0;
         ChangeCountCard();

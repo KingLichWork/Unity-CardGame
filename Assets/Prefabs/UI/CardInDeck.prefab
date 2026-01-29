@@ -222,6 +222,7 @@ GameObject:
   - component: {fileID: 5453692335554160495}
   - component: {fileID: 7437089093599672147}
   - component: {fileID: 2462730595393219032}
+  - component: {fileID: 8163070025128268341}
   m_Layer: 5
   m_Name: CardInDeck
   m_TagString: Untagged
@@ -315,9 +316,24 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 77a54ceb9de118b4bbdff351d9a7ad09, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Points: {fileID: 1497539999736428418}
-  Name: {fileID: 2131282369628290456}
-  Image: {fileID: 3236200791693616097}
+  _points: {fileID: 1497539999736428418}
+  _name: {fileID: 2131282369628290456}
+  _image: {fileID: 3236200791693616097}
+--- !u!114 &8163070025128268341
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4118126207460901042}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 86ce9295cd0da3146a521128cb23d30b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  IsMainCard: 0
+  IsInDeck: 0
+  CardInfoScript: {fileID: 0}
 --- !u!1 &4468928791588198043
 GameObject:
   m_ObjectHideFlags: 0

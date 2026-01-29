@@ -1813,7 +1813,7 @@ GameObject:
   - component: {fileID: 3937266686522887680}
   - component: {fileID: 4835152991433060207}
   m_Layer: 5
-  m_Name: Button
+  m_Name: PlayButton
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -2615,7 +2615,7 @@ GameObject:
   - component: {fileID: 2983948854360524723}
   - component: {fileID: 1094339609840580587}
   m_Layer: 5
-  m_Name: Button (2)
+  m_Name: ToMenuButton
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -3048,7 +3048,7 @@ GameObject:
   - component: {fileID: 459015203954208547}
   - component: {fileID: 5281785162596415218}
   m_Layer: 5
-  m_Name: Button (3)
+  m_Name: ClearDeckButton
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -4090,7 +4090,7 @@ GameObject:
   - component: {fileID: 528548249004650367}
   - component: {fileID: 6370645580626687800}
   m_Layer: 5
-  m_Name: Button (1)
+  m_Name: RandomDeckButton
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -4362,6 +4362,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 8484149978692871937}
+  - component: {fileID: 6061566460716615727}
   m_Layer: 5
   m_Name: DeckBuildPanel
   m_TagString: Untagged
@@ -4389,6 +4390,22 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
+--- !u!114 &6061566460716615727
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 9143441557848609496}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9ad648bc816df8d4584f877b2d408bdb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _randomDeckButton: {fileID: 528548249004650367}
+  _clearDeckButton: {fileID: 5281785162596415218}
+  _playButton: {fileID: 3937266686522887680}
+  _toMenuButton: {fileID: 1094339609840580587}
 --- !u!1 &9164474562191630718
 GameObject:
   m_ObjectHideFlags: 0

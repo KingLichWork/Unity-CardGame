@@ -1,11 +1,18 @@
-using TMPro;
+﻿using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
 public class CardInDeck : MonoBehaviour
 {
-    public TextMeshProUGUI Points;
-    public TextMeshProUGUI Name;
+    [SerializeField] private TextMeshProUGUI _points;
+    [SerializeField] private TextMeshProUGUI _name;
 
-    public Image Image;
+    [SerializeField] private Image _image;
+
+    public void SetInfo(string name, string points, Sprite sprite)
+    {
+        _name.text = name;
+        _points.text = points;
+        _image.sprite = sprite;
+    }
 }
