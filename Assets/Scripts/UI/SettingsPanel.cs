@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using TMPro;
 using UnityEditor.Localization.Editor;
 using UnityEngine;
@@ -26,19 +27,18 @@ public class SettingsPanel : UIPanel
     private AudioClip[] _voiceClips;
     private AudioClip[] _effectsClips;
 
-    private int _baseVolume = 20;
-    private int _minVolume = 20;
-
-    private LocalizationManager _localizationManager;
-
-    [Inject]
-    private void Construct(LocalizationManager localizationManager)
+    private readonly Dictionary<AudioChannel, string> _soundMixerParams =
+    new()
     {
-        _localizationManager = localizationManager;
-    }
+        { AudioChannel.Master, "MasterVolume" },
+        { AudioChannel.Effects, "EffectsVolume" },
+        { AudioChannel.Voice, "VoiceVolume" }
+    };
 
     private void OnEnable()
     {
+        SetStart();
+
         _closeButton.onClick.AddListener(Hide);
 
         _masterSoundVolume.onValueChanged.AddListener(MasterVolumeChanged);
@@ -65,9 +65,9 @@ public class SettingsPanel : UIPanel
 
     public void Init()
     {
-        _mainAudioMixer.SetFloat("MasterVolume", Mathf.Log10(_masterSoundVolume.value) * 20);
-        _mainAudioMixer.SetFloat("EffectsVolume", Mathf.Log10(_effectsSoundVolume.value) * 20);
-        _mainAudioMixer.SetFloat("VoiceVolume", Mathf.Log10(_voiceSoundVolume.value) * 20);
+        LoadVolume(AudioChannel.Master);
+        LoadVolume(AudioChannel.Effects);
+        LoadVolume(AudioChannel.Voice);
 
         _voiceClips = Resources.LoadAll<AudioClip>("Sounds/Cards/Deployment/");
         _effectsClips = Resources.LoadAll<AudioClip>("Sounds/Cards/StartOrder/");
@@ -89,13 +89,11 @@ public class SettingsPanel : UIPanel
         }
     }
 
-    public void SettingsShow()
+    private void SetStart()
     {
-        _masterSoundVolume.value = GetFloatFromAudioMixer("MasterVolume") * _baseVolume - _minVolume;
-        _effectsSoundVolume.value = GetFloatFromAudioMixer("EffectsVolume") * _baseVolume - _minVolume;
-        _voiceSoundVolume.value = GetFloatFromAudioMixer("VoiceVolume") * _baseVolume - _minVolume;
-
-        Show();
+        _masterSoundVolume.value = PlayerPrefs.GetFloat(_soundMixerParams[AudioChannel.Master], 0.2f);
+        _effectsSoundVolume.value = PlayerPrefs.GetFloat(_soundMixerParams[AudioChannel.Effects], 0.2f);
+        _voiceSoundVolume.value = PlayerPrefs.GetFloat(_soundMixerParams[AudioChannel.Voice], 0.2f);
     }
 
     private void SwitchLanguage(int value)
@@ -112,25 +110,53 @@ public class SettingsPanel : UIPanel
         }
     }
 
+    private void LoadVolume(AudioChannel channel)
+    {
+        float value = PlayerPrefs.GetFloat(
+            channel.ToString(),
+            0.2f
+        );
+
+        _mainAudioMixer.SetFloat(
+            _soundMixerParams[channel],
+            LinearToDb(value)
+        );
+    }
+
+    private float LinearToDb(float value)
+    {
+        value = Mathf.Clamp(value, 0.0001f, 1f);
+        return Mathf.Log10(value) * 20f;
+    }
+
     private void MasterVolumeChanged(float value)
     {
-        _mainAudioMixer.SetFloat("MasterVolume", value * _baseVolume - _minVolume);
+        _mainAudioMixer.SetFloat("MasterVolume", LinearToDb(value));
 
+        SaveVolume(_soundMixerParams[AudioChannel.Master], value);
         PlayRandomSound(_audioSourceVoice, true);
     }
 
     private void EffectsVolumeChanged(float value)
     {
-        _mainAudioMixer.SetFloat("EffectsVolume", value * _baseVolume - _minVolume);
+        _mainAudioMixer.SetFloat("EffectsVolume", LinearToDb(value));
 
+        SaveVolume(_soundMixerParams[AudioChannel.Effects], value);
         PlayRandomSound(_audioSourceVolume, false);
     }
 
     private void VoiceVolumeChanged(float value)
     {
-        _mainAudioMixer.SetFloat("VoiceVolume", value * _baseVolume - _minVolume);
+        _mainAudioMixer.SetFloat("VoiceVolume", LinearToDb(value));
 
+        SaveVolume(_soundMixerParams[AudioChannel.Voice], value);
         PlayRandomSound(_audioSourceVoice, true);
+    }
+
+    private void SaveVolume(string typeVolume, float value)
+    {
+        PlayerPrefs.SetFloat(typeVolume, value);
+        PlayerPrefs.Save();
     }
 
     private void PlayRandomSound(AudioSource audioSource, bool isVoice)
@@ -144,15 +170,15 @@ public class SettingsPanel : UIPanel
         audioSource.Play();
     }
 
-    private float GetFloatFromAudioMixer(string nameFloat)
-    {
-        float value;
-        _mainAudioMixer.GetFloat(nameFloat, out value);
-        return value;
-    }
-
     private void SetHowToPlay(bool isTrue)
     {
         HowToPlay.Instance.SetIsHowToPlay(isTrue);
     }
+}
+
+public enum AudioChannel
+{
+    Master,
+    Effects,
+    Voice
 }

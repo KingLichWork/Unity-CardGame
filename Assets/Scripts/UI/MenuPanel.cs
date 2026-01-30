@@ -38,7 +38,7 @@ public class MenuPanel : UIPanel
 
     private void Settings()
     {
-        _settingsPanel.SettingsShow();
+        _settingsPanel.Show();
     }
 
     private void Exit()
