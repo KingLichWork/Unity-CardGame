@@ -1,18 +1,20 @@
 ﻿using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
+using VContainer;
 
-public class Menu : UIPanel
+public class MenuPanel : UIPanel
 {
-    [SerializeField] private SettingsPanel _settingsPanel;
-
     [SerializeField] private Button _startGameButton;
     [SerializeField] private Button _settingsButton;
     [SerializeField] private Button _exitButton;
 
-    private void Start()
+    private SettingsPanel _settingsPanel;
+
+    [Inject]
+    private void Construct(SettingsPanel settingsPanel)
     {
-        _settingsPanel.SetStart();
+        _settingsPanel = settingsPanel;
     }
 
     private void OnEnable()

@@ -1,0 +1,152 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5b11a58205ec3474ca216360e9fa74a8, type: 3}
+  m_Name: EnRu Shared Data
+  m_EditorClassIdentifier: 
+  m_TableCollectionName: EnRu
+  m_TableCollectionNameGuidString: b9e22c38b5d85ca4aaefd38e33056936
+  m_Entries:
+  - m_Id: 24277582585856
+    m_Key: Clear Deck
+    m_Metadata:
+      m_Items: []
+  - m_Id: 23389019283456
+    m_Key: Close
+    m_Metadata:
+      m_Items: []
+  - m_Id: 25104258932736
+    m_Key: DeckTutorial1
+    m_Metadata:
+      m_Items: []
+  - m_Id: 25174169591808
+    m_Key: DeckTutorial2
+    m_Metadata:
+      m_Items: []
+  - m_Id: 25189852094464
+    m_Key: DeckTutorial3
+    m_Metadata:
+      m_Items: []
+  - m_Id: 25203529719808
+    m_Key: DeckTutorial4
+    m_Metadata:
+      m_Items: []
+  - m_Id: 27625794805760
+    m_Key: Draw
+    m_Metadata:
+      m_Items: []
+  - m_Id: 23558783737856
+    m_Key: Effects volume
+    m_Metadata:
+      m_Items: []
+  - m_Id: 26359828029440
+    m_Key: End Turn
+    m_Metadata:
+      m_Items: []
+  - m_Id: 247014072320
+    m_Key: Exit
+    m_Metadata:
+      m_Items: []
+  - m_Id: 25774911365120
+    m_Key: GameTutorial1
+    m_Metadata:
+      m_Items: []
+  - m_Id: 25823049392128
+    m_Key: GameTutorial2
+    m_Metadata:
+      m_Items: []
+  - m_Id: 25838673174528
+    m_Key: GameTutorial3
+    m_Metadata:
+      m_Items: []
+  - m_Id: 25852665372672
+    m_Key: GameTutorial4
+    m_Metadata:
+      m_Items: []
+  - m_Id: 25875364945920
+    m_Key: GameTutorial5
+    m_Metadata:
+      m_Items: []
+  - m_Id: 25898802716672
+    m_Key: GameTutorial6
+    m_Metadata:
+      m_Items: []
+  - m_Id: 25914606854144
+    m_Key: GameTutorial7
+    m_Metadata:
+      m_Items: []
+  - m_Id: 25936207519744
+    m_Key: GameTutorial8
+    m_Metadata:
+      m_Items: []
+  - m_Id: 23687800528896
+    m_Key: How To Play
+    m_Metadata:
+      m_Items: []
+  - m_Id: 23764766007296
+    m_Key: 'Language:'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 27563274510336
+    m_Key: Lose
+    m_Metadata:
+      m_Items: []
+  - m_Id: 23476868980736
+    m_Key: Master volume
+    m_Metadata:
+      m_Items: []
+  - m_Id: 27698159132672
+    m_Key: Pause
+    m_Metadata:
+      m_Items: []
+  - m_Id: 24194426314752
+    m_Key: Random Deck
+    m_Metadata:
+      m_Items: []
+  - m_Id: 189610827776
+    m_Key: Settings
+    m_Metadata:
+      m_Items: []
+  - m_Id: 24654067507200
+    m_Key: Show current points
+    m_Metadata:
+      m_Items: []
+  - m_Id: 24403977936896
+    m_Key: To menu
+    m_Metadata:
+      m_Items: []
+  - m_Id: 23637166891008
+    m_Key: Voice volume
+    m_Metadata:
+      m_Items: []
+  - m_Id: 27238736044032
+    m_Key: WIn
+    m_Metadata:
+      m_Items: []
+  - m_Id: 27967907405824
+    m_Key: Play
+    m_Metadata:
+      m_Items: []
+  - m_Id: 28403221635072
+    m_Key: Pass
+    m_Metadata:
+      m_Items: []
+  m_Metadata:
+    m_Items: []
+  m_KeyGenerator:
+    rid: 5275759845712068632
+  references:
+    version: 2
+    RefIds:
+    - rid: 5275759845712068632
+      type: {class: DistributedUIDGenerator, ns: UnityEngine.Localization.Tables, asm: Unity.Localization}
+      data:
+        m_CustomEpoch: 1769771251676

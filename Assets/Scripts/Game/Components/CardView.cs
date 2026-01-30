@@ -4,6 +4,7 @@ using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
+using VContainer;
 
 public class CardView : MonoBehaviour, IPointerClickHandler
 {
@@ -23,6 +24,7 @@ public class CardView : MonoBehaviour, IPointerClickHandler
     }
 
     public GameObject CardViewObject;
+
     [SerializeField] private Image CardViewImage;
     [SerializeField] private TextMeshProUGUI CardViewName;
     [SerializeField] private TextMeshProUGUI CardViewSecondName;
@@ -52,7 +54,15 @@ public class CardView : MonoBehaviour, IPointerClickHandler
     [SerializeField] private TextMeshProUGUI SpawnCardViewDescription;
     [SerializeField] private TextMeshProUGUI SpawnCardPoints;
 
+    private LocalizationManager _localizationManager;
+
     public List<GameObject> StatusEffectDescriptionList = new List<GameObject>();
+
+    [Inject]
+    private void Construct(LocalizationManager localizationManager)
+    {
+        _localizationManager = localizationManager;
+    }
 
     private void Awake()
     {
@@ -153,17 +163,17 @@ public class CardView : MonoBehaviour, IPointerClickHandler
         SpawnCardViewDescription.color = Color.black;
 
         if (!selfIllusion)
-            SpawnCardViewDescription.text = LocalizationManager.Instance.Language switch
+            SpawnCardViewDescription.text = LocalizationManager.Language switch
             {
-                ("en") => SpawnCard.BaseCard.DescriptionEng,
-                ("ru") => SpawnCard.BaseCard.DescriptionRu,
+                (Languages.En) => SpawnCard.BaseCard.DescriptionEng,
+                (Languages.Ru) => SpawnCard.BaseCard.DescriptionRu,
                 _ => SpawnCard.BaseCard.DescriptionEng,
             };
         else
-            SpawnCardViewDescription.text = LocalizationManager.Instance.Language switch
+            SpawnCardViewDescription.text = LocalizationManager.Language switch
             {
-                ("en") => "Illusion.",
-                ("ru") => "Иллюзия.",
+                (Languages.En) => "Illusion.",
+                (Languages.Ru) => "Иллюзия.",
                 _ => "Illusion.",
             };
     }
@@ -173,24 +183,17 @@ public class CardView : MonoBehaviour, IPointerClickHandler
         CardViewDescription cardViewDescription = Instantiate(CardViewDescriptionPrefab, Vector3.forward, Quaternion.identity, CardViewDescriptionParent.transform);
         cardViewDescription.Image.sprite = CardEffectsDescriptionList.effectDescriptionList[NumberEffects].EffectImage;
 
-
-        if (FindObjectOfType<LocalizationManager>() != null)
-            switch (LocalizationManager.Instance.Language)
-            {
-                case "en":
-                    cardViewDescription.Name.text = CardEffectsDescriptionList.effectDescriptionList[NumberEffects].NameEng;
-                    cardViewDescription.Description.text = CardEffectsDescriptionList.effectDescriptionList[NumberEffects].DescriptionEng;
-                    break;
-
-                case "ru":
-                    cardViewDescription.Name.text = CardEffectsDescriptionList.effectDescriptionList[NumberEffects].NameRu;
-                    cardViewDescription.Description.text = CardEffectsDescriptionList.effectDescriptionList[NumberEffects].DescriptionRu;
-                    break;
-            }
-        else
+        switch (LocalizationManager.Language)
         {
-            cardViewDescription.Name.text = CardEffectsDescriptionList.effectDescriptionList[NumberEffects].NameEng;
-            cardViewDescription.Description.text = CardEffectsDescriptionList.effectDescriptionList[NumberEffects].DescriptionEng;
+            case Languages.En:
+                cardViewDescription.Name.text = CardEffectsDescriptionList.effectDescriptionList[NumberEffects].NameEng;
+                cardViewDescription.Description.text = CardEffectsDescriptionList.effectDescriptionList[NumberEffects].DescriptionEng;
+                break;
+
+            case Languages.Ru:
+                cardViewDescription.Name.text = CardEffectsDescriptionList.effectDescriptionList[NumberEffects].NameRu;
+                cardViewDescription.Description.text = CardEffectsDescriptionList.effectDescriptionList[NumberEffects].DescriptionRu;
+                break;
         }
 
         StatusEffectDescriptionList.Add(cardViewDescription.gameObject);

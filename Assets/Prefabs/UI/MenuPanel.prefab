@@ -248,7 +248,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f5ed16d4fba484f4d88c89fc17ff2d96, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _settingsPanel: {fileID: 0}
   _startGameButton: {fileID: 7141240935203845199}
   _settingsButton: {fileID: 7629564432386036300}
   _exitButton: {fileID: 939851126513243986}
@@ -263,7 +262,7 @@ GameObject:
   - component: {fileID: 7917738613429923096}
   - component: {fileID: 1624977558122073322}
   - component: {fileID: 2446759430600560950}
-  - component: {fileID: 7572936303531624164}
+  - component: {fileID: 2192039165116135420}
   m_Layer: 5
   m_Name: Text (TMP)
   m_TagString: Untagged
@@ -387,7 +386,7 @@ MonoBehaviour:
   m_hasFontAssetChanged: 0
   m_baseMaterial: {fileID: 0}
   m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
---- !u!114 &7572936303531624164
+--- !u!114 &2192039165116135420
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -396,12 +395,37 @@ MonoBehaviour:
   m_GameObject: {fileID: 2959790673827430222}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d1c5d80a7f7dd964ab14a05840c7aa91, type: 3}
+  m_Script: {fileID: 11500000, guid: 56eb0353ae6e5124bb35b17aff880f16, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _isIdentically: 0
-  _en: Play
-  _ru: "\u0418\u0433\u0440\u0430\u0442\u044C"
+  m_StringReference:
+    m_TableReference:
+      m_TableCollectionName: GUID:b9e22c38b5d85ca4aaefd38e33056936
+    m_TableEntryReference:
+      m_KeyId: 27967907405824
+      m_Key: 
+    m_FallbackState: 0
+    m_WaitForCompletion: 0
+    m_LocalVariables: []
+  m_FormatArguments: []
+  m_UpdateString:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 2446759430600560950}
+        m_TargetAssemblyTypeName: TMPro.TMP_Text, Unity.TextMeshPro
+        m_MethodName: set_text
+        m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+  references:
+    version: 2
+    RefIds: []
 --- !u!1 &3662663585340423895
 GameObject:
   m_ObjectHideFlags: 0
@@ -924,7 +948,7 @@ GameObject:
   - component: {fileID: 8443128208898887797}
   - component: {fileID: 2497166678999813128}
   - component: {fileID: 4261033601534453845}
-  - component: {fileID: 896406240379926707}
+  - component: {fileID: 6127061086862300428}
   m_Layer: 5
   m_Name: Text (TMP)
   m_TagString: Untagged
@@ -1048,7 +1072,7 @@ MonoBehaviour:
   m_hasFontAssetChanged: 0
   m_baseMaterial: {fileID: 0}
   m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
---- !u!114 &896406240379926707
+--- !u!114 &6127061086862300428
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -1057,12 +1081,37 @@ MonoBehaviour:
   m_GameObject: {fileID: 7760726511492861420}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d1c5d80a7f7dd964ab14a05840c7aa91, type: 3}
+  m_Script: {fileID: 11500000, guid: 56eb0353ae6e5124bb35b17aff880f16, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _isIdentically: 0
-  _en: Settings
-  _ru: "\u041D\u0430\u0441\u0442\u0440\u043E\u0439\u043A\u0438"
+  m_StringReference:
+    m_TableReference:
+      m_TableCollectionName: GUID:b9e22c38b5d85ca4aaefd38e33056936
+    m_TableEntryReference:
+      m_KeyId: 189610827776
+      m_Key: 
+    m_FallbackState: 0
+    m_WaitForCompletion: 0
+    m_LocalVariables: []
+  m_FormatArguments: []
+  m_UpdateString:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 4261033601534453845}
+        m_TargetAssemblyTypeName: TMPro.TMP_Text, Unity.TextMeshPro
+        m_MethodName: set_text
+        m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+  references:
+    version: 2
+    RefIds: []
 --- !u!1 &7875895304195584700
 GameObject:
   m_ObjectHideFlags: 0
@@ -1187,7 +1236,7 @@ GameObject:
   - component: {fileID: 2326736657497731179}
   - component: {fileID: 7189888896460239631}
   - component: {fileID: 7018663025015628794}
-  - component: {fileID: 7768667454280273502}
+  - component: {fileID: 5522423886856457083}
   m_Layer: 5
   m_Name: Text (TMP)
   m_TagString: Untagged
@@ -1311,7 +1360,7 @@ MonoBehaviour:
   m_hasFontAssetChanged: 0
   m_baseMaterial: {fileID: 0}
   m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
---- !u!114 &7768667454280273502
+--- !u!114 &5522423886856457083
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -1320,12 +1369,37 @@ MonoBehaviour:
   m_GameObject: {fileID: 8791509391619954467}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d1c5d80a7f7dd964ab14a05840c7aa91, type: 3}
+  m_Script: {fileID: 11500000, guid: 56eb0353ae6e5124bb35b17aff880f16, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _isIdentically: 0
-  _en: Exit
-  _ru: "\u0412\u044B\u0445\u043E\u0434"
+  m_StringReference:
+    m_TableReference:
+      m_TableCollectionName: GUID:b9e22c38b5d85ca4aaefd38e33056936
+    m_TableEntryReference:
+      m_KeyId: 247014072320
+      m_Key: 
+    m_FallbackState: 0
+    m_WaitForCompletion: 0
+    m_LocalVariables: []
+  m_FormatArguments: []
+  m_UpdateString:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 7018663025015628794}
+        m_TargetAssemblyTypeName: TMPro.TMP_Text, Unity.TextMeshPro
+        m_MethodName: set_text
+        m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+  references:
+    version: 2
+    RefIds: []
 --- !u!1 &9067769792544653604
 GameObject:
   m_ObjectHideFlags: 0

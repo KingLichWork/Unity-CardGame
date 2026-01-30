@@ -1,0 +1,151 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e9620f8c34305754d8cc9a7e49e852d9, type: 3}
+  m_Name: EnRu_en
+  m_EditorClassIdentifier: 
+  m_LocaleId:
+    m_Code: en
+  m_SharedData: {fileID: 11400000, guid: b9e22c38b5d85ca4aaefd38e33056936, type: 2}
+  m_Metadata:
+    m_Items: []
+  m_TableData:
+  - m_Id: 27563274510336
+    m_Localized: Lose
+    m_Metadata:
+      m_Items: []
+  - m_Id: 189610827776
+    m_Localized: Settings
+    m_Metadata:
+      m_Items: []
+  - m_Id: 247014072320
+    m_Localized: Exit
+    m_Metadata:
+      m_Items: []
+  - m_Id: 23389019283456
+    m_Localized: Close
+    m_Metadata:
+      m_Items: []
+  - m_Id: 23476868980736
+    m_Localized: Master volume
+    m_Metadata:
+      m_Items: []
+  - m_Id: 23558783737856
+    m_Localized: Effects volume
+    m_Metadata:
+      m_Items: []
+  - m_Id: 23637166891008
+    m_Localized: Voice volume
+    m_Metadata:
+      m_Items: []
+  - m_Id: 23687800528896
+    m_Localized: How To Play
+    m_Metadata:
+      m_Items: []
+  - m_Id: 23764766007296
+    m_Localized: 'Language:'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 24194426314752
+    m_Localized: Random Deck
+    m_Metadata:
+      m_Items: []
+  - m_Id: 24277582585856
+    m_Localized: Clear Deck
+    m_Metadata:
+      m_Items: []
+  - m_Id: 24403977936896
+    m_Localized: To menu
+    m_Metadata:
+      m_Items: []
+  - m_Id: 24654067507200
+    m_Localized: Show current points
+    m_Metadata:
+      m_Items: []
+  - m_Id: 25104258932736
+    m_Localized: Hover over and press the right button to get information about the
+      Cards.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 25174169591808
+    m_Localized: Left click to select card.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 25189852094464
+    m_Localized: Left click in decklist to remove from deck.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 25203529719808
+    m_Localized: Draw 20 card or random deck.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 25774911365120
+    m_Localized: Players can play one card per turn.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 25823049392128
+    m_Localized: After that, they must pass the turn to their opponent.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 25838673174528
+    m_Localized: ' 60 seconds are allotted for the move. If the timer ends and a
+      card has not been played, a random card will be removed from the hand.'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 25852665372672
+    m_Localized: The points of the played card are added to the player's total point
+      pool.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 25875364945920
+    m_Localized: Only 10 units can be on the field at the same time.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 25898802716672
+    m_Localized: Cards have features, to view them, press the right mouse button.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 25914606854144
+    m_Localized: ' After both players have run out of cards, the player with more
+      points wins. Good luck.'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 25936207519744
+    m_Localized: 'HotKeys:  Space = end turn; Escape = Pause Panel;'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 26359828029440
+    m_Localized: End Turn
+    m_Metadata:
+      m_Items: []
+  - m_Id: 27625794805760
+    m_Localized: Draw
+    m_Metadata:
+      m_Items: []
+  - m_Id: 27238736044032
+    m_Localized: WIn
+    m_Metadata:
+      m_Items: []
+  - m_Id: 27698159132672
+    m_Localized: Pause
+    m_Metadata:
+      m_Items: []
+  - m_Id: 27967907405824
+    m_Localized: Play
+    m_Metadata:
+      m_Items: []
+  - m_Id: 28403221635072
+    m_Localized: Pass
+    m_Metadata:
+      m_Items: []
+  references:
+    version: 2
+    RefIds: []

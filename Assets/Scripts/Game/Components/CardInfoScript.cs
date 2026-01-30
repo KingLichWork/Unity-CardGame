@@ -1,6 +1,7 @@
 ﻿using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
+using VContainer;
 
 public class CardInfoScript : MonoBehaviour
 {
@@ -47,6 +48,14 @@ public class CardInfoScript : MonoBehaviour
     [HideInInspector] public GameObject StatusEffectInvisibility;
     [HideInInspector] public GameObject StatusEffectInvulnerability;
 
+    private LocalizationManager _localizationManager;
+
+    [Inject]
+    private void Construct(LocalizationManager localizationManager)
+    {
+        _localizationManager = localizationManager;
+    }
+
     public int ShowPoints(Card card)
     {
         return card.BaseCard.Points;
@@ -64,20 +73,16 @@ public class CardInfoScript : MonoBehaviour
         Name.text = card.BaseCard.Name.ToString();
         SecondName.text = card.BaseCard.AbilityName.ToString();
 
+        switch (LocalizationManager.Language)
+        {
+            case Languages.En:
+                Description.text = card.BaseCard.DescriptionEng.ToString();
+                break;
 
-        if (FindObjectOfType<LocalizationManager>() != null)
-            switch (LocalizationManager.Instance.Language)
-            {
-                case "en":
-                    Description.text = card.BaseCard.DescriptionEng.ToString();
-                    break;
-
-                case "ru":
-                    Description.text = card.BaseCard.DescriptionRu.ToString();
-                    break;
-            }
-        else
-            Description.text = card.BaseCard.DescriptionEng.ToString();
+            case Languages.Ru:
+                Description.text = card.BaseCard.DescriptionRu.ToString();
+                break;
+        }
 
         if (card.BaseCard.ArmorPoints > 0)
         {

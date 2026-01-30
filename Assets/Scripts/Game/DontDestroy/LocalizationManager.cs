@@ -1,38 +1,35 @@
-using TMPro;
-using UnityEngine;
-using UnityEngine.UI;
+﻿using UnityEngine;
+using UnityEngine.Localization.Settings;
 
-public class LocalizationManager : MonoBehaviour
+public class LocalizationManager
 {
-    private static LocalizationManager _instance;
+    public static Languages Language = Languages.En;
 
-    public static LocalizationManager Instance
+    public static void SetLanguage(int numberLocate)
     {
-        get
-        {
-            if (_instance == null)
-            {
-                _instance = FindObjectOfType<LocalizationManager>();
-            }
+        LocalizationSettings.SelectedLocale = LocalizationSettings.AvailableLocales.Locales[numberLocate];
+        Language = (Languages)numberLocate;
 
-            return _instance;
-        }
+        PlayerPrefs.SetInt("Language", numberLocate);
+        PlayerPrefs.Save();
     }
 
-    public string Language = "en";
-
-    private void Awake()
+    public static string GetLocalizedString(TableNames table, string key, params object[] data)
     {
-        if (_instance == null)
-        {
-            _instance = this;
-            DontDestroyOnLoad(gameObject);
-        }
+        var localizedString = LocalizationSettings.StringDatabase.GetLocalizedString(table.ToString(), key, data);
 
-        else
-        {
-            Destroy(gameObject);
-        }
+        return localizedString;
     }
+}
+
+public enum Languages
+{
+    En,
+    Ru
+}
+
+public enum TableNames
+{
+    EnRu
 }
 

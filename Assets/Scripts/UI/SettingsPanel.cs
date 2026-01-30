@@ -1,8 +1,11 @@
 ﻿using System;
 using TMPro;
+using UnityEditor.Localization.Editor;
 using UnityEngine;
 using UnityEngine.Audio;
+using UnityEngine.Localization.Settings;
 using UnityEngine.UI;
+using VContainer;
 
 public class SettingsPanel : UIPanel
 {
@@ -26,7 +29,13 @@ public class SettingsPanel : UIPanel
     private int _baseVolume = 20;
     private int _minVolume = 20;
 
-    public static event Action ChangeLanguage;
+    private LocalizationManager _localizationManager;
+
+    [Inject]
+    private void Construct(LocalizationManager localizationManager)
+    {
+        _localizationManager = localizationManager;
+    }
 
     private void OnEnable()
     {
@@ -54,7 +63,7 @@ public class SettingsPanel : UIPanel
         _languageDropdown.onValueChanged.RemoveListener(SwitchLanguage);
     }
 
-    public void SetStart()
+    public void Init()
     {
         _mainAudioMixer.SetFloat("MasterVolume", Mathf.Log10(_masterSoundVolume.value) * 20);
         _mainAudioMixer.SetFloat("EffectsVolume", Mathf.Log10(_effectsSoundVolume.value) * 20);
@@ -65,20 +74,15 @@ public class SettingsPanel : UIPanel
 
         _howToPlayToggle.isOn = HowToPlay.Instance.IsHowToPlay;
 
-        if (PlayerPrefs.HasKey("Language"))
-            LocalizationManager.Instance.Language = PlayerPrefs.GetString("Language");
-        else
-            LocalizationManager.Instance.Language = "en";
-
         if (_languageDropdown != null)
         {
-            switch (LocalizationManager.Instance.Language)
+            switch (LocalizationManager.Language)
             {
-                case "en":
+                case Languages.En:
                     _languageDropdown.value = 0;
                     break;
 
-                case "ru":
+                case Languages.Ru:
                     _languageDropdown.value = 1;
                     break;
             }
@@ -99,18 +103,13 @@ public class SettingsPanel : UIPanel
         switch (value)
         {
             case 0:
-                LocalizationManager.Instance.Language = "en";
+                LocalizationManager.SetLanguage((int)Languages.En);
                 break;
 
             case 1:
-                LocalizationManager.Instance.Language = "ru";
+                LocalizationManager.SetLanguage((int)Languages.Ru);
                 break;
         }
-
-        PlayerPrefs.SetString("Language", LocalizationManager.Instance.Language);
-        PlayerPrefs.Save();
-
-        ChangeLanguage.Invoke();
     }
 
     private void MasterVolumeChanged(float value)
