@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
@@ -47,8 +47,8 @@ public class Deck : MonoBehaviour, IPointerClickHandler
 
             DeckList.Add(cardGameObject);
 
-            cardGameObject.AddComponent<ChoseCard>();
-            cardGameObject.GetComponent<ChoseCard>().enabled = false;
+            ChoseCard choseCard = cardGameObject.AddComponent<ChoseCard>();
+            choseCard.enabled = false;
             cardGameObject.GetComponent<CardMove>().enabled = false;
 
             cardGameObject.GetComponent<CardInfoScript>().ShowCardInfo(card);

@@ -1,30 +1,17 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using VContainer;
+using VContainer.Unity;
 
-public class CardMechanics : MonoBehaviour
+public class CardMechanics
 {
-    private static CardMechanics _instance;
+    private IObjectResolver _objectResolver;
 
-    public static CardMechanics Instance
+    [Inject]
+    private void Construct(IObjectResolver resolver)
     {
-        get
-        {
-            if (_instance == null)
-            {
-                _instance = FindObjectOfType<CardMechanics>();
-            }
-
-            return _instance;
-        }
-    }
-
-    private void Awake()
-    {
-        if (_instance == null)
-        {
-            _instance = this;
-        }
+        _objectResolver = resolver;
     }
 
     public void Deployment(CardInfoScript targetCard, CardInfoScript startCard, int distanceNearCard = 0)
@@ -281,8 +268,8 @@ public class CardMechanics : MonoBehaviour
 
         EffectsManager.Instance.StartDestroyCoroutine(card);
 
-        Destroy(card.DescriptionObject);
-        Destroy(card.gameObject, EffectsManager.Instance.ParticleTimeToMove + 1);
+        Object.Destroy(card.DescriptionObject);
+        Object.Destroy(card.gameObject, EffectsManager.Instance.ParticleTimeToMove + 1);
     }
 
     public void SwapPoints(CardInfoScript firstCard, CardInfoScript secondCard)
@@ -476,7 +463,7 @@ public class CardMechanics : MonoBehaviour
                     (!player && GameManager.Instance.EnemyFieldCards.Count < GameManager.Instance.MaxNumberCardInField)))
                     return;
 
-                spawnCard = Instantiate(GameManager.Instance.CardPref, card.transform.parent, false);
+                spawnCard = _objectResolver.Instantiate(GameManager.Instance.CardPref, card.transform.parent, false);
                 CardInfoScript summonCardInfo = spawnCard.GetComponent<CardInfoScript>();
 
                 card.CheckSiblingIndex();
@@ -490,8 +477,10 @@ public class CardMechanics : MonoBehaviour
                 summonCardInfo.ShowCardInfo(card.SelfCard);
                 summonCardInfo.SelfCard.StatusEffects.IsIllusion = true;
                 CheckStatusEffects(summonCardInfo);
-                spawnCard.AddComponent<ChoseCard>();
-                spawnCard.GetComponent<ChoseCard>().enabled = false;
+
+                ChoseCard choseCard  = spawnCard.AddComponent<ChoseCard>();
+                _objectResolver.Inject(choseCard);
+                choseCard.enabled = false;
             }
         }
 
@@ -503,7 +492,7 @@ public class CardMechanics : MonoBehaviour
                 (!player && GameManager.Instance.EnemyFieldCards.Count < GameManager.Instance.MaxNumberCardInField)))
                     return;
 
-                spawnCard = Instantiate(GameManager.Instance.CardPref, card.transform.parent, false);
+                spawnCard = _objectResolver.Instantiate(GameManager.Instance.CardPref, card.transform.parent, false);
                 CardInfoScript summonCardInfo = spawnCard.GetComponent<CardInfoScript>();
 
                 card.CheckSiblingIndex();
@@ -515,8 +504,10 @@ public class CardMechanics : MonoBehaviour
                 if (player) GameManager.Instance.PlayerFieldCards.Add(summonCardInfo);
                 else GameManager.Instance.EnemyFieldCards.Add(summonCardInfo);
                 summonCardInfo.ShowCardInfo(CardManagerList.FindCard(card.SelfCard.Spawns.SpawnCardName));
-                spawnCard.AddComponent<ChoseCard>();
-                spawnCard.GetComponent<ChoseCard>().enabled = false;
+
+                ChoseCard choseCard = spawnCard.AddComponent<ChoseCard>();
+                _objectResolver.Inject(choseCard);
+                choseCard.enabled = false;
             }
         }
     }
@@ -559,47 +550,47 @@ public class CardMechanics : MonoBehaviour
         if (card.SelfCard.StatusEffects.IsSelfShielded && card.StatusEffectShield == null)
         {
             card.CardStatusEffectImage.material = new Material(EffectsManager.Instance.ShieldMaterial);
-            card.StatusEffectShield = Instantiate(card.StatusEffectPrefab, card.CardStatusEffectImage.gameObject.transform);
+            card.StatusEffectShield = _objectResolver.Instantiate(card.StatusEffectPrefab, card.CardStatusEffectImage.gameObject.transform);
             card.StatusEffectShield.GetComponent<StatusEffect>().InitializeStatusEffect(StatusEffectsType.shield);
         }
 
         else if (!card.SelfCard.StatusEffects.IsSelfShielded && card.StatusEffectShield != null)
         {
             card.CardStatusEffectImage.material = null;
-            Destroy(card.StatusEffectShield);
+            Object.Destroy(card.StatusEffectShield);
             card.StatusEffectShield = null;
         }
 
         if (card.SelfCard.StatusEffects.IsIllusion && card.StatusEffectIllusion == null)
         {
             card.CardStatusEffectImage.material = new Material(EffectsManager.Instance.IllusionMaterial);
-            card.StatusEffectIllusion = Instantiate(card.StatusEffectPrefab, card.CardStatusEffectImage.gameObject.transform);
+            card.StatusEffectIllusion = _objectResolver.Instantiate(card.StatusEffectPrefab, card.CardStatusEffectImage.gameObject.transform);
             card.StatusEffectIllusion.GetComponent<StatusEffect>().InitializeStatusEffect(StatusEffectsType.illusion);
         }
 
         if (card.SelfCard.StatusEffects.IsSelfStunned && card.StatusEffectStunned == null)
         {
-            card.StatusEffectStunned = Instantiate(card.StatusEffectPrefab, card.CardStatusEffectImage.gameObject.transform);
+            card.StatusEffectStunned = _objectResolver.Instantiate(card.StatusEffectPrefab, card.CardStatusEffectImage.gameObject.transform);
             card.StatusEffectStunned.GetComponent<StatusEffect>().InitializeStatusEffect(StatusEffectsType.stun);
         }
 
         else if (!card.SelfCard.StatusEffects.IsSelfStunned && card.StatusEffectStunned != null)
         {
-            Destroy(card.StatusEffectStunned);
+            Object.Destroy(card.StatusEffectStunned);
             card.StatusEffectStunned = null;
         }
 
         if (card.SelfCard.StatusEffects.IsInvulnerability && card.StatusEffectInvulnerability == null)
         {
             card.CardStatusEffectImage.material = new Material(EffectsManager.Instance.InvulnerabilityMaterial);
-            card.StatusEffectInvulnerability = Instantiate(card.StatusEffectPrefab, card.CardStatusEffectImage.gameObject.transform);
+            card.StatusEffectInvulnerability = _objectResolver.Instantiate(card.StatusEffectPrefab, card.CardStatusEffectImage.gameObject.transform);
             card.StatusEffectInvulnerability.GetComponent<StatusEffect>().InitializeStatusEffect(StatusEffectsType.invulnerability);
         }
 
         if (card.SelfCard.StatusEffects.IsInvisibility && card.StatusEffectInvisibility == null)
         {
             card.CardStatusEffectImage.material = new Material(EffectsManager.Instance.InvisibilityMaterial);
-            card.StatusEffectInvisibility = Instantiate(card.StatusEffectPrefab, card.CardStatusEffectImage.gameObject.transform);
+            card.StatusEffectInvisibility = _objectResolver.Instantiate(card.StatusEffectPrefab, card.CardStatusEffectImage.gameObject.transform);
             card.StatusEffectInvisibility.GetComponent<StatusEffect>().InitializeStatusEffect(StatusEffectsType.invisibility);
         }
 

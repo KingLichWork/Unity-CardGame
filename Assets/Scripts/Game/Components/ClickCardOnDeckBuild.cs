@@ -1,3 +1,4 @@
+﻿using System;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
@@ -8,6 +9,9 @@ public class ClickCardOnDeckBuild : MonoBehaviour, IPointerClickHandler
 
     public CardInfoScript CardInfoScript;
 
+    public static event Action<CardInfoScript> AddCardAction;
+    public static event Action<CardInfoScript, GameObject> RemoveCardAction;
+
     public void OnPointerClick(PointerEventData eventData)
     {
         CardInfoScript card = transform.GetComponent<CardInfoScript>();
@@ -16,13 +20,12 @@ public class ClickCardOnDeckBuild : MonoBehaviour, IPointerClickHandler
         {
             if (!IsInDeck && IsMainCard)
             {
-
-                DeckBuildManager.Instance.AddCard(card);
+                AddCardAction.Invoke(card);
                 CardInDeck(card);
             }
             else if (!IsMainCard)
             {
-                DeckBuildManager.Instance.RemoveCard(CardInfoScript, gameObject);
+                RemoveCardAction.Invoke(CardInfoScript, gameObject);
                 CardRemoveFromDeck(CardInfoScript);
             }
         }
@@ -32,8 +35,8 @@ public class ClickCardOnDeckBuild : MonoBehaviour, IPointerClickHandler
             CardView.Instance.CardViewObject.SetActive(true);
             CardView.Instance.ShowCard(card);
         }
-
     }
+
     public void CardInDeck(CardInfoScript card)
     {
         card.ImageEdge1.color = Color.red;

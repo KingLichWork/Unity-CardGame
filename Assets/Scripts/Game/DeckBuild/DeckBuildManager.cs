@@ -5,21 +5,6 @@ using UnityEngine.SceneManagement;
 
 public class DeckBuildManager : MonoBehaviour
 {
-    private static DeckBuildManager _instance;
-
-    public static DeckBuildManager Instance
-    {
-        get
-        {
-            if (_instance == null)
-            {
-                _instance = FindObjectOfType<DeckBuildManager>();
-            }
-
-            return _instance;
-        }
-    }
-
     [SerializeField] private GameObject _cardPref;
     [SerializeField] private GameObject _cardInDeckPref;
 
@@ -43,19 +28,14 @@ public class DeckBuildManager : MonoBehaviour
     private int _needCountCardInDeck = 20;
     private int _countCardInDeck = 0;
 
-    private void Awake()
-    {
-        if (_instance == null)
-        {
-            _instance = this;
-        }
-    }
-
     private void OnEnable()
     {
         DeckBuildUI.RandomDeckAction += RandomDeck;
         DeckBuildUI.ClearDeckAction += ClearDeck;
         DeckBuildUI.PlayAction += Play;
+
+        ClickCardOnDeckBuild.AddCardAction += AddCard;
+        ClickCardOnDeckBuild.RemoveCardAction += RemoveCard;
     }
 
     private void OnDisable()
@@ -63,6 +43,9 @@ public class DeckBuildManager : MonoBehaviour
         DeckBuildUI.RandomDeckAction -= RandomDeck;
         DeckBuildUI.ClearDeckAction -= ClearDeck;
         DeckBuildUI.PlayAction -= Play;
+
+        ClickCardOnDeckBuild.AddCardAction -= AddCard;
+        ClickCardOnDeckBuild.RemoveCardAction -= RemoveCard;
     }
 
     private void Start()
@@ -96,7 +79,7 @@ public class DeckBuildManager : MonoBehaviour
             HowToPlay.Instance.HowToPlayDeckBuild(_howToPlayList);
     }
 
-    public void AddCard(CardInfoScript card)
+    private void AddCard(CardInfoScript card)
     {
         _countCardInDeck++;
 
@@ -122,7 +105,7 @@ public class DeckBuildManager : MonoBehaviour
         CardSound(card);
     }
 
-    public void RemoveCard(CardInfoScript card, GameObject cardInDeck)
+    private void RemoveCard(CardInfoScript card, GameObject cardInDeck)
     {
         _countCardInDeck--;
         ChangeCountCard();
