@@ -1,3 +1,4 @@
+﻿using System;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.EventSystems;
@@ -12,10 +13,11 @@ public class DropField : MonoBehaviour, IPointerEnterHandler, IPointerExitHandle
 
     private bool _isChangeEmptyCardPositionInHand;
 
-    [HideInInspector] public UnityEvent<CardInfoScript> DropCard;
-
     private CardMove card;
     private CardInfoScript cardInfo;
+
+    public static event Action<CardInfoScript> DropCardAction;
+    public static event Action<CardInfoScript, bool> ThrowCardAction;
 
     private void Awake()
     {
@@ -45,8 +47,8 @@ public class DropField : MonoBehaviour, IPointerEnterHandler, IPointerExitHandle
 
         ChildRayCast(false);
 
-        card.ChangeCardPosition.AddListener(ChangeCardPosition);
-        card.HideEmptyCard.AddListener(HideEmptyCard);
+        card.ChangeCardPosition += ChangeCardPosition;
+        card.HideEmptyCard += HideEmptyCard;
 
         if (TypeField == TypeField.SELF_TABLE && !cardInfo.SelfCard.StatusEffects.IsInvisibility)
         {
@@ -115,10 +117,9 @@ public class DropField : MonoBehaviour, IPointerEnterHandler, IPointerExitHandle
         {
             if (TypeField == TypeField.SELF_TABLE && !cardInfo.SelfCard.StatusEffects.IsInvisibility)
             {
-                if (GameManager.Instance.PlayerFieldCards.Count >= GameManager.Instance.MaxNumberCardInField)
+                if (GameManager.Instance.PlayerFieldCards.Count >= GameManager.MaxNumberCardInField)
                 {
-                    GameManager.Instance.ThrowCard(cardInfo, true);
-                    GameManager.Instance.IsHandCardPlaying = true;
+                    ThrowCardAction.Invoke(cardInfo, true);
 
                     HideEmptyCard();
                     return;
@@ -131,15 +132,14 @@ public class DropField : MonoBehaviour, IPointerEnterHandler, IPointerExitHandle
 
                 HideEmptyCard();
 
-                DropCard.Invoke(cardInfo);
+                DropCardAction.Invoke(cardInfo);
             }
 
             else if (TypeField == TypeField.ENEMY_TABLE && cardInfo.SelfCard.StatusEffects.IsInvisibility)
             {
-                if (GameManager.Instance.EnemyFieldCards.Count >= GameManager.Instance.MaxNumberCardInField)
+                if (GameManager.Instance.EnemyFieldCards.Count >= GameManager.MaxNumberCardInField)
                 {
-                    GameManager.Instance.ThrowCard(cardInfo, true);
-                    GameManager.Instance.IsHandCardPlaying = true;
+                    ThrowCardAction.Invoke(cardInfo, true);
 
                     HideEmptyCard();
                     return;
@@ -152,7 +152,7 @@ public class DropField : MonoBehaviour, IPointerEnterHandler, IPointerExitHandle
 
                 HideEmptyCard();
 
-                DropCard.Invoke(cardInfo);
+                DropCardAction.Invoke(cardInfo);
             }
 
             else

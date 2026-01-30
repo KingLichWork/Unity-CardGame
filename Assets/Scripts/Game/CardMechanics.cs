@@ -8,10 +8,19 @@ public class CardMechanics
 {
     private IObjectResolver _objectResolver;
 
+    private GameManager _gameManager;
+    private UIManager _uiManager;
+    private EffectsManager _effectsManager;
+    private SoundManager _soundManager;
+
     [Inject]
-    private void Construct(IObjectResolver resolver)
+    private void Construct(IObjectResolver resolver, GameManager gameManager, UIManager uiManager, EffectsManager effectsManager, SoundManager soundManager)
     {
         _objectResolver = resolver;
+        _gameManager = gameManager;
+        _uiManager = uiManager;
+        _effectsManager = effectsManager;
+        _soundManager = soundManager;
     }
 
     public void Deployment(CardInfoScript targetCard, CardInfoScript startCard, int distanceNearCard = 0)
@@ -20,14 +29,14 @@ public class CardMechanics
         {
             ChangeCardPoints(startCard, targetCard, startCard.SelfCard.BoostOrDamage.Boost + distanceNearCard * startCard.SelfCard.BoostOrDamage.ChangeNearBoost);
 
-            EffectsManager.Instance.StartParticleEffects(startCard.transform, targetCard.transform, startCard.SelfCard.BoostOrDamage.Boost);
+            _effectsManager.StartParticleEffects(startCard.transform, targetCard.transform, startCard.SelfCard.BoostOrDamage.Boost);
         }
 
         if (startCard.SelfCard.BoostOrDamage.Damage != 0)
         {
             ChangeCardPoints(startCard, targetCard, -startCard.SelfCard.BoostOrDamage.Damage - distanceNearCard * startCard.SelfCard.BoostOrDamage.ChangeNearDamage);
 
-            EffectsManager.Instance.StartParticleEffects(startCard.transform, targetCard.transform, -startCard.SelfCard.BoostOrDamage.Damage);
+            _effectsManager.StartParticleEffects(startCard.transform, targetCard.transform, -startCard.SelfCard.BoostOrDamage.Damage);
         }
 
         CheckUICards(targetCard, startCard);
@@ -39,14 +48,14 @@ public class CardMechanics
         {
             ChangeCardPoints(startCard, startCard, startCard.SelfCard.BoostOrDamage.SelfBoost);
 
-            EffectsManager.Instance.StartParticleEffects(startCard.transform, targetCard.transform, startCard.SelfCard.BoostOrDamage.SelfBoost);
+            _effectsManager.StartParticleEffects(startCard.transform, targetCard.transform, startCard.SelfCard.BoostOrDamage.SelfBoost);
         }
 
         if (startCard.SelfCard.BoostOrDamage.SelfDamage != 0)
         {
             ChangeCardPoints(startCard, startCard, -startCard.SelfCard.BoostOrDamage.SelfDamage);
 
-            EffectsManager.Instance.StartParticleEffects(startCard.transform, targetCard.transform, -startCard.SelfCard.BoostOrDamage.SelfDamage);
+            _effectsManager.StartParticleEffects(startCard.transform, targetCard.transform, -startCard.SelfCard.BoostOrDamage.SelfDamage);
         }
 
         CheckUICards(targetCard, startCard);
@@ -57,15 +66,15 @@ public class CardMechanics
         if (startCard.SelfCard.EndTurnActions.EndTurnSelfBoost != 0 && isSelfOrNear)
         {
             ChangeCardPoints(startCard, startCard, startCard.SelfCard.EndTurnActions.EndTurnSelfBoost, true);
-            SoundManager.Instance.EndTurnSound(startCard);
-            EffectsManager.Instance.StartParticleEffects(startCard.transform, startCard.transform, startCard.SelfCard.EndTurnActions.EndTurnSelfBoost);
+            _soundManager.EndTurnSound(startCard);
+            _effectsManager.StartParticleEffects(startCard.transform, startCard.transform, startCard.SelfCard.EndTurnActions.EndTurnSelfBoost);
         }
 
         if (startCard.SelfCard.EndTurnActions.EndTurnSelfDamage != 0 && isSelfOrNear)
         {
             ChangeCardPoints(startCard, startCard, -startCard.SelfCard.EndTurnActions.EndTurnSelfDamage, true);
-            SoundManager.Instance.EndTurnSound(startCard);
-            EffectsManager.Instance.StartParticleEffects(startCard.transform, startCard.transform, -startCard.SelfCard.EndTurnActions.EndTurnSelfDamage);
+            _soundManager.EndTurnSound(startCard);
+            _effectsManager.StartParticleEffects(startCard.transform, startCard.transform, -startCard.SelfCard.EndTurnActions.EndTurnSelfDamage);
         }
 
         if (startCard.SelfCard.EndTurnActions.EndTurnNearBoost != 0 && isSelfOrNear)
@@ -75,16 +84,16 @@ public class CardMechanics
             if (ReturnNearCard(startCard, 1, false) != null)
             {
                 ChangeCardPoints(startCard, ReturnNearCard(startCard, 1, false)[0], startCard.SelfCard.EndTurnActions.EndTurnNearBoost, true);
-                EffectsManager.Instance.StartParticleEffects(startCard.transform, ReturnNearCard(startCard, 1, false)[0].transform, startCard.SelfCard.EndTurnActions.EndTurnNearBoost);
+                _effectsManager.StartParticleEffects(startCard.transform, ReturnNearCard(startCard, 1, false)[0].transform, startCard.SelfCard.EndTurnActions.EndTurnNearBoost);
             }
 
             if (ReturnNearCard(startCard, 1, true) != null)
             {
                 ChangeCardPoints(startCard, ReturnNearCard(startCard, 1, true)[0], startCard.SelfCard.EndTurnActions.EndTurnNearBoost, true);
-                EffectsManager.Instance.StartParticleEffects(startCard.transform, ReturnNearCard(startCard, 1, true)[0].transform, startCard.SelfCard.EndTurnActions.EndTurnNearBoost);
+                _effectsManager.StartParticleEffects(startCard.transform, ReturnNearCard(startCard, 1, true)[0].transform, startCard.SelfCard.EndTurnActions.EndTurnNearBoost);
             }
 
-            SoundManager.Instance.EndTurnSound(startCard);
+            _soundManager.EndTurnSound(startCard);
         }
 
         if (startCard.SelfCard.EndTurnActions.EndTurnNearDamage != 0 && isSelfOrNear)
@@ -94,29 +103,29 @@ public class CardMechanics
             if (ReturnNearCard(startCard, 1, false) != null)
             {
                 ChangeCardPoints(startCard, ReturnNearCard(startCard, 1, false)[0], -startCard.SelfCard.EndTurnActions.EndTurnNearDamage, true);
-                EffectsManager.Instance.StartParticleEffects(startCard.transform, ReturnNearCard(startCard, 1, false)[0].transform, -startCard.SelfCard.EndTurnActions.EndTurnNearDamage);
+                _effectsManager.StartParticleEffects(startCard.transform, ReturnNearCard(startCard, 1, false)[0].transform, -startCard.SelfCard.EndTurnActions.EndTurnNearDamage);
             }
             if (ReturnNearCard(startCard, 1, true) != null)
             {
                 ChangeCardPoints(startCard, ReturnNearCard(startCard, 1, true)[0], -startCard.SelfCard.EndTurnActions.EndTurnNearDamage, true);
-                EffectsManager.Instance.StartParticleEffects(startCard.transform, ReturnNearCard(startCard, 1, true)[0].transform, -startCard.SelfCard.EndTurnActions.EndTurnNearDamage);
+                _effectsManager.StartParticleEffects(startCard.transform, ReturnNearCard(startCard, 1, true)[0].transform, -startCard.SelfCard.EndTurnActions.EndTurnNearDamage);
             }
 
-            SoundManager.Instance.EndTurnSound(startCard);
+            _soundManager.EndTurnSound(startCard);
         }
 
         if (startCard.SelfCard.EndTurnActions.EndTurnRandomBoost != 0 && !isSelfOrNear)
         {
             ChangeCardPoints(startCard, targetCard, startCard.SelfCard.EndTurnActions.EndTurnRandomBoost, true);
-            SoundManager.Instance.EndTurnSound(startCard);
-            EffectsManager.Instance.StartParticleEffects(startCard.transform, targetCard.transform, startCard.SelfCard.EndTurnActions.EndTurnRandomBoost);
+            _soundManager.EndTurnSound(startCard);
+            _effectsManager.StartParticleEffects(startCard.transform, targetCard.transform, startCard.SelfCard.EndTurnActions.EndTurnRandomBoost);
         }
 
         if (startCard.SelfCard.EndTurnActions.EndTurnRandomDamage != 0 && !isSelfOrNear)
         {
             ChangeCardPoints(startCard, targetCard, -startCard.SelfCard.EndTurnActions.EndTurnRandomDamage, true);
-            SoundManager.Instance.EndTurnSound(startCard);
-            EffectsManager.Instance.StartParticleEffects(startCard.transform, targetCard.transform, -startCard.SelfCard.EndTurnActions.EndTurnRandomDamage);
+            _soundManager.EndTurnSound(startCard);
+            _effectsManager.StartParticleEffects(startCard.transform, targetCard.transform, -startCard.SelfCard.EndTurnActions.EndTurnRandomDamage);
         }
     }
 
@@ -129,7 +138,7 @@ public class CardMechanics
     {
         if (targetCard != null)
         {
-            UIManager.Instance.CheckColorPointsCard(targetCard);
+            _uiManager.CheckColorPointsCard(targetCard);
             CheckStatusEffects(targetCard);
             IsDestroyCard(targetCard, isEndTurn);
 
@@ -137,7 +146,7 @@ public class CardMechanics
 
         if (startCard != null)
         {
-            UIManager.Instance.CheckColorPointsCard(startCard);
+            _uiManager.CheckColorPointsCard(startCard);
             IsDestroyCard(startCard, isEndTurn);
         }
     }
@@ -167,7 +176,7 @@ public class CardMechanics
                 value = -targetCard.UniqueMechanics.HealDamageValue;
             }
 
-            SoundManager.Instance.EndTurnSound(targetCardInfo);
+            _soundManager.EndTurnSound(targetCardInfo);
         }
 
         if (targetCard.UniqueMechanics.ReturnDamageValue != 0 && (value < 0) && targetCardInfo != startCardInfo)
@@ -181,7 +190,7 @@ public class CardMechanics
                 ChangeCardPoints(targetCardInfo, startCardInfo, -1, isEndTurn);
             }
 
-            SoundManager.Instance.EndTurnSound(targetCardInfo);
+            _soundManager.EndTurnSound(targetCardInfo);
         }
 
         if ((!isPiercingDamage) && (value < 0 && targetCard.BaseCard.ArmorPoints > 0))
@@ -194,18 +203,18 @@ public class CardMechanics
             if (targetCard.BaseCard.ArmorPoints < 0)
                 targetCard.BaseCard.ArmorPoints = 0;
 
-            UIManager.Instance.CheckArmor(targetCardInfo);
+            _uiManager.CheckArmor(targetCardInfo);
             Debug.Log(startCard.BaseCard.Name + " изменила броню " + targetCard.BaseCard.Name + " в размере " + -temporaryArmor + "\n" + (targetCard.BaseCard.ArmorPoints + temporaryArmor) + " => " + targetCard.BaseCard.ArmorPoints);
         }
 
         targetCard.BaseCard.Points += value;
 
         if (value < 0)
-            EffectsManager.Instance.StartShaderEffect(targetCardInfo, Color.red, value);
+            _effectsManager.StartShaderEffect(targetCardInfo, Color.red, value);
         else if (value > 0)
-            EffectsManager.Instance.StartShaderEffect(targetCardInfo, Color.green, value);
+            _effectsManager.StartShaderEffect(targetCardInfo, Color.green, value);
         else
-            EffectsManager.Instance.StartShaderEffect(targetCardInfo, Color.grey, value);
+            _effectsManager.StartShaderEffect(targetCardInfo, Color.grey, value);
 
         if (value != 0)
             Debug.Log(startCard.BaseCard.Name + " изменила силу " + targetCard.BaseCard.Name + " в размере " + value + "\n" + (targetCard.BaseCard.Points - value) + " => " + targetCard.BaseCard.Points);
@@ -236,11 +245,11 @@ public class CardMechanics
                 card.gameObject.transform.parent = card.transform.parent.parent;
                 card.gameObject.SetActive(false);
 
-                if (GameManager.Instance.PlayerFieldCards.Contains(card))
-                    GameManager.Instance.PlayerFieldDestroyedInEndTurnCards.Add(card);
+                if (_gameManager.PlayerFieldCards.Contains(card))
+                    _gameManager.PlayerFieldDestroyedInEndTurnCards.Add(card);
 
-                else if (GameManager.Instance.EnemyFieldCards.Contains(card))
-                    GameManager.Instance.EnemyFieldDestroyedInEndTurnCards.Add(card);
+                else if (_gameManager.EnemyFieldCards.Contains(card))
+                    _gameManager.EnemyFieldDestroyedInEndTurnCards.Add(card);
             }
         }
     }
@@ -251,25 +260,25 @@ public class CardMechanics
         if (startCard != null)
         {
             Debug.Log(startCard.SelfCard.BaseCard.Name + " уничтожила " + card.SelfCard.BaseCard.Name);
-            EffectsManager.Instance.StartParticleEffects(startCard.transform, card.transform, -1);
+            _effectsManager.StartParticleEffects(startCard.transform, card.transform, -1);
         }
 
-        if (GameManager.Instance.PlayerFieldCards.Contains(card))
-            GameManager.Instance.PlayerFieldCards.Remove(card);
+        if (_gameManager.PlayerFieldCards.Contains(card))
+            _gameManager.PlayerFieldCards.Remove(card);
 
-        else if (GameManager.Instance.EnemyFieldCards.Contains(card))
-            GameManager.Instance.EnemyFieldCards.Remove(card);
+        else if (_gameManager.EnemyFieldCards.Contains(card))
+            _gameManager.EnemyFieldCards.Remove(card);
 
-        if (GameManager.Instance.PlayerFieldInvulnerabilityCards.Contains(card))
-            GameManager.Instance.PlayerFieldInvulnerabilityCards.Remove(card);
+        if (_gameManager.PlayerFieldInvulnerabilityCards.Contains(card))
+            _gameManager.PlayerFieldInvulnerabilityCards.Remove(card);
 
-        else if (GameManager.Instance.EnemyFieldInvulnerabilityCards.Contains(card))
-            GameManager.Instance.EnemyFieldInvulnerabilityCards.Remove(card);
+        else if (_gameManager.EnemyFieldInvulnerabilityCards.Contains(card))
+            _gameManager.EnemyFieldInvulnerabilityCards.Remove(card);
 
-        EffectsManager.Instance.StartDestroyCoroutine(card);
+        _effectsManager.StartDestroyCoroutine(card);
 
         Object.Destroy(card.DescriptionObject);
-        Object.Destroy(card.gameObject, EffectsManager.Instance.ParticleTimeToMove + 1);
+        Object.Destroy(card.gameObject, _effectsManager.ParticleTimeToMove + 1);
     }
 
     public void SwapPoints(CardInfoScript firstCard, CardInfoScript secondCard)
@@ -286,21 +295,21 @@ public class CardMechanics
         ShowPointsUI(firstCard);
         ShowPointsUI(secondCard);
 
-        EffectsManager.Instance.StartParticleEffects(firstCard.transform, secondCard.transform, color);
+        _effectsManager.StartParticleEffects(firstCard.transform, secondCard.transform, color);
     }
 
     public IEnumerator EndTurnActions()
     {
-        if (GameManager.Instance.IsPlayerTurn)
+        if (_gameManager.IsPlayerTurn)
         {
-            GameManager.Instance.PlayerFieldCards = GameManager.Instance.EndTurnOrderCard(GameManager.Instance.PlayerFieldCards, true);
-            foreach (CardInfoScript card in GameManager.Instance.PlayerFieldCards)
+            _gameManager.PlayerFieldCards = _gameManager.EndTurnOrderCard(_gameManager.PlayerFieldCards, true);
+            foreach (CardInfoScript card in _gameManager.PlayerFieldCards)
             {
                 if (card.SelfCard.EndTurnActions.Timer > 0)
                 {
                     card.SelfCard.EndTurnActions.Timer--;
-                    SoundManager.Instance.TimerSound(card);
-                    UIManager.Instance.CheckTimer(card);
+                    _soundManager.TimerSound(card);
+                    _uiManager.CheckTimer(card);
                 }
 
                 if (!card.SelfCard.BaseCard.isDestroyed && card.SelfCard.EndTurnActions.Timer == 0)
@@ -315,11 +324,11 @@ public class CardMechanics
 
                             EndTurn(card, isSelfOrNear: true);
 
-                            if ((card.SelfCard.EndTurnActions.EndTurnRandomDamage != 0) && (GameManager.Instance.EnemyFieldCards.Count - GameManager.Instance.EnemyFieldDestroyedInEndTurnCards.Count > 0))
+                            if ((card.SelfCard.EndTurnActions.EndTurnRandomDamage != 0) && (_gameManager.EnemyFieldCards.Count - _gameManager.EnemyFieldDestroyedInEndTurnCards.Count > 0))
                             {
-                                List<CardInfoScript> existingEnemyFieldCards = new List<CardInfoScript>(GameManager.Instance.EnemyFieldCards);
+                                List<CardInfoScript> existingEnemyFieldCards = new List<CardInfoScript>(_gameManager.EnemyFieldCards);
 
-                                foreach (CardInfoScript nonExistentCard in GameManager.Instance.EnemyFieldDestroyedInEndTurnCards)
+                                foreach (CardInfoScript nonExistentCard in _gameManager.EnemyFieldDestroyedInEndTurnCards)
                                 {
                                     existingEnemyFieldCards.Remove(nonExistentCard);
                                 }
@@ -327,11 +336,11 @@ public class CardMechanics
                                 EndTurn(card, existingEnemyFieldCards[Random.Range(0, existingEnemyFieldCards.Count)], false);
                             }
 
-                            if ((card.SelfCard.EndTurnActions.EndTurnRandomBoost != 0) && (GameManager.Instance.PlayerFieldCards.Count - GameManager.Instance.PlayerFieldDestroyedInEndTurnCards.Count > 0))
+                            if ((card.SelfCard.EndTurnActions.EndTurnRandomBoost != 0) && (_gameManager.PlayerFieldCards.Count - _gameManager.PlayerFieldDestroyedInEndTurnCards.Count > 0))
                             {
-                                List<CardInfoScript> existingPlayerFieldCards = new List<CardInfoScript>(GameManager.Instance.PlayerFieldCards);
+                                List<CardInfoScript> existingPlayerFieldCards = new List<CardInfoScript>(_gameManager.PlayerFieldCards);
 
-                                foreach (CardInfoScript nonExistentCard in GameManager.Instance.PlayerFieldDestroyedInEndTurnCards)
+                                foreach (CardInfoScript nonExistentCard in _gameManager.PlayerFieldDestroyedInEndTurnCards)
                                 {
                                     existingPlayerFieldCards.Remove(nonExistentCard);
                                 }
@@ -364,14 +373,14 @@ public class CardMechanics
 
         else
         {
-            GameManager.Instance.EnemyFieldCards = GameManager.Instance.EndTurnOrderCard(GameManager.Instance.EnemyFieldCards, false);
-            foreach (CardInfoScript card in GameManager.Instance.EnemyFieldCards)
+            _gameManager.EnemyFieldCards = _gameManager.EndTurnOrderCard(_gameManager.EnemyFieldCards, false);
+            foreach (CardInfoScript card in _gameManager.EnemyFieldCards)
             {
                 if (card.SelfCard.EndTurnActions.Timer > 0)
                 {
                     card.SelfCard.EndTurnActions.Timer--;
-                    SoundManager.Instance.TimerSound(card);
-                    UIManager.Instance.CheckTimer(card);
+                    _soundManager.TimerSound(card);
+                    _uiManager.CheckTimer(card);
                 }
 
                 if (!card.SelfCard.BaseCard.isDestroyed && card.SelfCard.EndTurnActions.Timer == 0)
@@ -382,11 +391,11 @@ public class CardMechanics
                         {
                             EndTurn(card, isSelfOrNear: true);
 
-                            if ((card.SelfCard.EndTurnActions.EndTurnRandomDamage != 0) && (GameManager.Instance.PlayerFieldCards.Count - GameManager.Instance.PlayerFieldDestroyedInEndTurnCards.Count > 0))
+                            if ((card.SelfCard.EndTurnActions.EndTurnRandomDamage != 0) && (_gameManager.PlayerFieldCards.Count - _gameManager.PlayerFieldDestroyedInEndTurnCards.Count > 0))
                             {
-                                List<CardInfoScript> existingPlayerFieldCards = new List<CardInfoScript>(GameManager.Instance.PlayerFieldCards);
+                                List<CardInfoScript> existingPlayerFieldCards = new List<CardInfoScript>(_gameManager.PlayerFieldCards);
 
-                                foreach (CardInfoScript nonExistentCard in GameManager.Instance.PlayerFieldDestroyedInEndTurnCards)
+                                foreach (CardInfoScript nonExistentCard in _gameManager.PlayerFieldDestroyedInEndTurnCards)
                                 {
                                     existingPlayerFieldCards.Remove(nonExistentCard);
                                 }
@@ -394,11 +403,11 @@ public class CardMechanics
                                 EndTurn(card, existingPlayerFieldCards[Random.Range(0, existingPlayerFieldCards.Count)], false);
                             }
 
-                            if ((card.SelfCard.EndTurnActions.EndTurnRandomBoost != 0) && (GameManager.Instance.EnemyFieldCards.Count - GameManager.Instance.EnemyFieldDestroyedInEndTurnCards.Count > 0))
+                            if ((card.SelfCard.EndTurnActions.EndTurnRandomBoost != 0) && (_gameManager.EnemyFieldCards.Count - _gameManager.EnemyFieldDestroyedInEndTurnCards.Count > 0))
                             {
-                                List<CardInfoScript> existingEnemyFieldCards = new List<CardInfoScript>(GameManager.Instance.EnemyFieldCards);
+                                List<CardInfoScript> existingEnemyFieldCards = new List<CardInfoScript>(_gameManager.EnemyFieldCards);
 
-                                foreach (CardInfoScript nonExistentCard in GameManager.Instance.EnemyFieldDestroyedInEndTurnCards)
+                                foreach (CardInfoScript nonExistentCard in _gameManager.EnemyFieldDestroyedInEndTurnCards)
                                 {
                                     existingEnemyFieldCards.Remove(nonExistentCard);
                                 }
@@ -436,18 +445,18 @@ public class CardMechanics
             if (card.SelfCard.StatusEffects.SelfEnduranceOrBleeding < 0)
             {
                 ChangeCardPoints(card, card, -1, isPiercingDamage: true);
-                EffectsManager.Instance.StartParticleEffects(card.transform, card.transform, -1);
+                _effectsManager.StartParticleEffects(card.transform, card.transform, -1);
                 card.SelfCard.StatusEffects.SelfEnduranceOrBleeding++;
             }
 
             else
             {
                 ChangeCardPoints(card, card, 1, isPiercingDamage: true);
-                EffectsManager.Instance.StartParticleEffects(card.transform, card.transform, 1);
+                _effectsManager.StartParticleEffects(card.transform, card.transform, 1);
                 card.SelfCard.StatusEffects.SelfEnduranceOrBleeding--;
             }
 
-            UIManager.Instance.CheckBleeding(card);
+            _uiManager.CheckBleeding(card);
         }
     }
 
@@ -459,11 +468,11 @@ public class CardMechanics
         {
             for (int i = 0; i < card.SelfCard.Spawns.SpawnCardCount; i++)
             {
-                if (!((player && GameManager.Instance.PlayerFieldCards.Count < GameManager.Instance.MaxNumberCardInField) ||
-                    (!player && GameManager.Instance.EnemyFieldCards.Count < GameManager.Instance.MaxNumberCardInField)))
+                if (!((player && _gameManager.PlayerFieldCards.Count < GameManager.MaxNumberCardInField) ||
+                    (!player && _gameManager.EnemyFieldCards.Count < GameManager.MaxNumberCardInField)))
                     return;
 
-                spawnCard = _objectResolver.Instantiate(GameManager.Instance.CardPref, card.transform.parent, false);
+                spawnCard = _objectResolver.Instantiate(_gameManager.CardPref, card.transform.parent, false);
                 CardInfoScript summonCardInfo = spawnCard.GetComponent<CardInfoScript>();
 
                 card.CheckSiblingIndex();
@@ -472,8 +481,8 @@ public class CardMechanics
                 else
                     spawnCard.transform.SetSiblingIndex(card.SiblingIndex + 1);
 
-                if (player) GameManager.Instance.PlayerFieldCards.Add(summonCardInfo);
-                else GameManager.Instance.EnemyFieldCards.Add(summonCardInfo);
+                if (player) _gameManager.PlayerFieldCards.Add(summonCardInfo);
+                else _gameManager.EnemyFieldCards.Add(summonCardInfo);
                 summonCardInfo.ShowCardInfo(card.SelfCard);
                 summonCardInfo.SelfCard.StatusEffects.IsIllusion = true;
                 CheckStatusEffects(summonCardInfo);
@@ -488,11 +497,11 @@ public class CardMechanics
         {
             for (int i = 0; i < card.SelfCard.Spawns.SpawnCardCount; i++)
             {
-                if (!((player && GameManager.Instance.PlayerFieldCards.Count < GameManager.Instance.MaxNumberCardInField) ||
-                (!player && GameManager.Instance.EnemyFieldCards.Count < GameManager.Instance.MaxNumberCardInField)))
+                if (!((player && _gameManager.PlayerFieldCards.Count < GameManager.MaxNumberCardInField) ||
+                (!player && _gameManager.EnemyFieldCards.Count < GameManager.MaxNumberCardInField)))
                     return;
 
-                spawnCard = _objectResolver.Instantiate(GameManager.Instance.CardPref, card.transform.parent, false);
+                spawnCard = _objectResolver.Instantiate(_gameManager.CardPref, card.transform.parent, false);
                 CardInfoScript summonCardInfo = spawnCard.GetComponent<CardInfoScript>();
 
                 card.CheckSiblingIndex();
@@ -501,8 +510,8 @@ public class CardMechanics
                 else
                     spawnCard.transform.SetSiblingIndex(card.SiblingIndex + 1);
 
-                if (player) GameManager.Instance.PlayerFieldCards.Add(summonCardInfo);
-                else GameManager.Instance.EnemyFieldCards.Add(summonCardInfo);
+                if (player) _gameManager.PlayerFieldCards.Add(summonCardInfo);
+                else _gameManager.EnemyFieldCards.Add(summonCardInfo);
                 summonCardInfo.ShowCardInfo(CardManagerList.FindCard(card.SelfCard.Spawns.SpawnCardName));
 
                 ChoseCard choseCard = spawnCard.AddComponent<ChoseCard>();
@@ -517,7 +526,7 @@ public class CardMechanics
         card.SelfCard = CardManagerList.FindCard(card.SelfCard.UniqueMechanics.TransformationCardName);
         card.ShowCardInfo(card.SelfCard);
 
-        EffectsManager.Instance.StartParticleEffects(card.transform, card.transform, 1);
+        _effectsManager.StartParticleEffects(card.transform, card.transform, 1);
     }
 
     public List<CardInfoScript> ReturnNearCard(CardInfoScript card, int range, bool IsRight)
@@ -549,7 +558,7 @@ public class CardMechanics
     {
         if (card.SelfCard.StatusEffects.IsSelfShielded && card.StatusEffectShield == null)
         {
-            card.CardStatusEffectImage.material = new Material(EffectsManager.Instance.ShieldMaterial);
+            card.CardStatusEffectImage.material = new Material(_effectsManager.ShieldMaterial);
             card.StatusEffectShield = _objectResolver.Instantiate(card.StatusEffectPrefab, card.CardStatusEffectImage.gameObject.transform);
             card.StatusEffectShield.GetComponent<StatusEffect>().InitializeStatusEffect(StatusEffectsType.shield);
         }
@@ -563,7 +572,7 @@ public class CardMechanics
 
         if (card.SelfCard.StatusEffects.IsIllusion && card.StatusEffectIllusion == null)
         {
-            card.CardStatusEffectImage.material = new Material(EffectsManager.Instance.IllusionMaterial);
+            card.CardStatusEffectImage.material = new Material(_effectsManager.IllusionMaterial);
             card.StatusEffectIllusion = _objectResolver.Instantiate(card.StatusEffectPrefab, card.CardStatusEffectImage.gameObject.transform);
             card.StatusEffectIllusion.GetComponent<StatusEffect>().InitializeStatusEffect(StatusEffectsType.illusion);
         }
@@ -582,18 +591,18 @@ public class CardMechanics
 
         if (card.SelfCard.StatusEffects.IsInvulnerability && card.StatusEffectInvulnerability == null)
         {
-            card.CardStatusEffectImage.material = new Material(EffectsManager.Instance.InvulnerabilityMaterial);
+            card.CardStatusEffectImage.material = new Material(_effectsManager.InvulnerabilityMaterial);
             card.StatusEffectInvulnerability = _objectResolver.Instantiate(card.StatusEffectPrefab, card.CardStatusEffectImage.gameObject.transform);
             card.StatusEffectInvulnerability.GetComponent<StatusEffect>().InitializeStatusEffect(StatusEffectsType.invulnerability);
         }
 
         if (card.SelfCard.StatusEffects.IsInvisibility && card.StatusEffectInvisibility == null)
         {
-            card.CardStatusEffectImage.material = new Material(EffectsManager.Instance.InvisibilityMaterial);
+            card.CardStatusEffectImage.material = new Material(_effectsManager.InvisibilityMaterial);
             card.StatusEffectInvisibility = _objectResolver.Instantiate(card.StatusEffectPrefab, card.CardStatusEffectImage.gameObject.transform);
             card.StatusEffectInvisibility.GetComponent<StatusEffect>().InitializeStatusEffect(StatusEffectsType.invisibility);
         }
 
-        UIManager.Instance.CheckBleeding(card);
+        _uiManager.CheckBleeding(card);
     }
 }

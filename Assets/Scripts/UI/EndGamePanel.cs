@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
+using VContainer;
 
 public class EndGamePanel : UIPanel
 {
@@ -16,6 +17,14 @@ public class EndGamePanel : UIPanel
     [SerializeField] private TextMeshProUGUI _endGameLose;
     [SerializeField] private TextMeshProUGUI _endGameDraw;
     [SerializeField] private TextMeshProUGUI _pauseText;
+
+    private GameManager _gameManager;
+
+    [Inject]
+    private void Construct(GameManager gameManager)
+    {
+        _gameManager = gameManager;
+    }
 
     private void OnEnable()
     {
@@ -64,16 +73,16 @@ public class EndGamePanel : UIPanel
 
     private void Restart()
     {
-        GameManager.Instance.NewGame();
+        _gameManager.NewGame();
     }
 
     private void ToDeckBuild()
     {
-        GameManager.Instance.DeckBuild();
+        _gameManager.DeckBuild();
     }
 
     private void Exit()
     {
-        GameManager.Instance.ToMenu();
+        _gameManager.ToMenu();
     }
 }

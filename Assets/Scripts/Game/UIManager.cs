@@ -2,24 +2,10 @@
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
+using VContainer;
 
 public class UIManager : MonoBehaviour
 {
-    private static UIManager _instance;
-
-    public static UIManager Instance
-    {
-        get
-        {
-            if (_instance == null)
-            {
-                _instance = FindObjectOfType<UIManager>();
-            }
-
-            return _instance;
-        }
-    }
-
     [HideInInspector] public bool IsPause;
 
     [SerializeField] private EndGamePanel _endGamePanel;
@@ -34,12 +20,12 @@ public class UIManager : MonoBehaviour
 
     [SerializeField] private LineRenderer _line;
 
-    private void Awake()
+    private GameManager _gameManager;
+
+    [Inject]
+    private void Construct(GameManager gameManager)
     {
-        if (_instance == null)
-        {
-            _instance = this;
-        }
+        _gameManager = gameManager;
     }
 
     public void ChangeEndTurnButtonInteractable(bool isInteractable)
@@ -90,8 +76,8 @@ public class UIManager : MonoBehaviour
 
     public void ChangeWick(int currentTime)
     {
-        _imageTurnTime[0].fillAmount = (float)currentTime / GameManager.Instance.TurnDuration;
-        _imageTurnTime[1].fillAmount = (float)currentTime / GameManager.Instance.TurnDuration;
+        _imageTurnTime[0].fillAmount = (float)currentTime / _gameManager.TurnDuration;
+        _imageTurnTime[1].fillAmount = (float)currentTime / _gameManager.TurnDuration;
     }
 
     public void ChangeLineColor(Color firstColor, Color secondColor)

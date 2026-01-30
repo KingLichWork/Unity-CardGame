@@ -33,7 +33,7 @@ public class GameManager : MonoBehaviour
     public GameObject HowToPlayFon;
 
     //ChangeGameCharacteristics
-    public int MaxNumberCardInField = 10;
+    public static int MaxNumberCardInField = 10;
     public int TurnDuration = 30;
     public int ValueDeckCards = 20;
     public int ValueHandCards = 10;
@@ -41,8 +41,11 @@ public class GameManager : MonoBehaviour
     public float TimeDrawCardStart = 0.15f;
     public float TimeDrawCard = 0.3f;
 
-    [HideInInspector] public bool IsStartGiveCards = false;
-    [HideInInspector] public bool IsDrag;
+    [HideInInspector] public static bool IsDrag;
+    [HideInInspector] public static bool IsStartGiveCards = false;
+    [HideInInspector] public static bool IsChoosing;
+    [HideInInspector] public static bool IsHandCardPlaying;
+
     [HideInInspector] public bool IsChooseCard;
 
     [HideInInspector] public List<CardInfoScript> PlayerHandCards = new List<CardInfoScript>();
@@ -59,8 +62,6 @@ public class GameManager : MonoBehaviour
 
     [HideInInspector] public List<Coroutine> AllCoroutine = new List<Coroutine>();
 
-    [HideInInspector] public bool IsChoosing;
-    [HideInInspector] public bool IsHandCardPlaying;
 
     [SerializeField] private Transform _enemyHand;
     [SerializeField] private Transform _playerHand;
@@ -81,23 +82,41 @@ public class GameManager : MonoBehaviour
     private Camera _mainCamera;
 
     private IObjectResolver _objectResolver;
+
     private CardMechanics _cardMechanics;
+    private UIManager _uiManager;
+    private EffectsManager _effectsManager;
+    private SoundManager _soundManager;
 
     public static event Action HideEndGamePanel;
 
     public bool IsPlayerTurn
     {
-        get
-        {
-            return _turn % 2 == 0;
-        }
+        get { return _turn % 2 == 0; }
     }
 
     [Inject]
-    private void Construct(IObjectResolver objectResolver, CardMechanics cardMechanics)
+    private void Construct(IObjectResolver objectResolver, CardMechanics cardMechanics, UIManager uiManager, EffectsManager effectsManager, SoundManager soundManager)
     {
         _objectResolver = objectResolver;
         _cardMechanics = cardMechanics;
+        _uiManager = uiManager;
+        _effectsManager = effectsManager;
+        _soundManager = soundManager;
+    }
+
+    private void OnEnable()
+    {
+        DropField.DropCardAction += PlayerDropCardStartCoroutine;
+        DropField.DropCardAction += PlayerDropCardStartCoroutine;
+        DropField.ThrowCardAction += ThrowCard;
+    }
+
+    private void OnDisable()
+    {
+        DropField.DropCardAction -= PlayerDropCardStartCoroutine;
+        DropField.DropCardAction -= PlayerDropCardStartCoroutine;
+        DropField.ThrowCardAction -= ThrowCard;
     }
 
     private void Awake()
@@ -106,9 +125,6 @@ public class GameManager : MonoBehaviour
         {
             _instance = this;
         }
-
-        _playerField.GetComponent<DropField>().DropCard.AddListener(PlayerDropCardStartCoroutine);
-        _enemyField.GetComponent<DropField>().DropCard.AddListener(PlayerDropCardStartCoroutine);
 
         _mainCamera = Camera.main;
     }
@@ -142,9 +158,9 @@ public class GameManager : MonoBehaviour
         _playerPoints = 0;
         _enemyPoints = 0;
 
-        CurrentGame = new Game();
+        CurrentGame = new Game(this);
 
-        UIManager.Instance.ChangeEndTurnButtonInteractable(false);
+        _uiManager.ChangeEndTurnButtonInteractable(false);
 
         //DebugGame();
         Deck.Instance.CreateDeck(CurrentGame.PlayerDeck);
@@ -153,7 +169,7 @@ public class GameManager : MonoBehaviour
 
         StartCoroutine(GiveHandCards(CurrentGame.EnemyDeck, _enemyHand, false, true));
         yield return StartCoroutine(GiveHandCards(CurrentGame.PlayerDeck, _playerHand, true, true));
-        EffectsManager.Instance.HideDrawCardEffect();
+        _effectsManager.HideDrawCardEffect();
 
         if (Object.FindObjectOfType<HowToPlay>() != null && HowToPlay.Instance.IsHowToPlay)
         {
@@ -164,7 +180,7 @@ public class GameManager : MonoBehaviour
             AllCoroutine.Add(StartCoroutine(TurnFunk()));
 
         IsStartGiveCards = false;
-        UIManager.Instance.ChangeEndTurnButtonInteractable(true);
+        _uiManager.ChangeEndTurnButtonInteractable(true);
     }
 
     private IEnumerator GiveHandCards(List<Card> deck, Transform hand, bool isPlayer, bool isStart = false)
@@ -183,12 +199,12 @@ public class GameManager : MonoBehaviour
 
         Card card = deck[0];
 
-        EffectsManager.Instance.DrawCardEffect(time, hand, isPlayer);
+        _effectsManager.DrawCardEffect(time, hand, isPlayer);
 
         yield return new WaitForSeconds(time);
 
         if (!isStart)
-            EffectsManager.Instance.HideDrawCardEffect();
+            _effectsManager.HideDrawCardEffect();
 
         GameObject cardHand = Instantiate(CardPref, hand, false);
 
@@ -200,21 +216,21 @@ public class GameManager : MonoBehaviour
         {
             cardHand.GetComponent<CardInfoScript>().HideCardInfo(card);
             EnemyHandCards.Add(cardHand.GetComponent<CardInfoScript>());
-            UIManager.Instance.CheckColorPointsCard(cardHand.GetComponent<CardInfoScript>());
+            _uiManager.CheckColorPointsCard(cardHand.GetComponent<CardInfoScript>());
         }
 
         else
         {
             cardHand.GetComponent<CardInfoScript>().ShowCardInfo(card);
             PlayerHandCards.Add(cardHand.GetComponent<CardInfoScript>());
-            UIManager.Instance.CheckColorPointsCard(cardHand.GetComponent<CardInfoScript>());
+            _uiManager.CheckColorPointsCard(cardHand.GetComponent<CardInfoScript>());
 
             Deck.Instance.DeleteFirstCardFromDeck();
         }
 
         deck.RemoveAt(0);
 
-        UIManager.Instance.ChangeDeckCount(CurrentGame);
+        _uiManager.ChangeDeckCount(CurrentGame);
     }
 
     public void StartTurnCoroutine()
@@ -226,7 +242,7 @@ public class GameManager : MonoBehaviour
     {
         _turnTime = TurnDuration;
 
-        UIManager.Instance.ChangeWick(_turnTime);
+        _uiManager.ChangeWick(_turnTime);
 
         if (IsPlayerTurn)
         {
@@ -234,7 +250,7 @@ public class GameManager : MonoBehaviour
             {
                 while (_turnTime-- > 0)
                 {
-                    UIManager.Instance.ChangeWick(_turnTime);
+                    _uiManager.ChangeWick(_turnTime);
 
                     yield return new WaitForSeconds(1);
 
@@ -268,7 +284,7 @@ public class GameManager : MonoBehaviour
 
     private IEnumerator ChangeTurn()
     {
-        UIManager.Instance.ChangeEndTurnButtonInteractable(false);
+        _uiManager.ChangeEndTurnButtonInteractable(false);
 
         if (IsPlayerTurn && !IsHandCardPlaying && PlayerHandCards.Count != 0)
             ThrowCard(PlayerHandCards[Random.Range(0, PlayerHandCards.Count)], true);
@@ -302,12 +318,12 @@ public class GameManager : MonoBehaviour
         if (_isPlayerPassed && _isEnemyPassed)
         {
             EndGame();
-            UIManager.Instance.EndGame(_playerPoints, _enemyPoints);
+            _uiManager.EndGame(_playerPoints, _enemyPoints);
         }
 
         _turn++;
         IsHandCardPlaying = false;
-        UIManager.Instance.ChangeEndTurnButtonInteractable(IsPlayerTurn);
+        _uiManager.ChangeEndTurnButtonInteractable(IsPlayerTurn);
 
         if (!(_isPlayerPassed && _isEnemyPassed))
             AllCoroutine.Add(StartCoroutine(TurnFunk()));
@@ -378,7 +394,7 @@ public class GameManager : MonoBehaviour
 
         _cardMechanics.CheckStatusEffects(card);
 
-        SoundManager.Instance.EnemyDeploymentSound(card);
+        _soundManager.EnemyDeploymentSound(card);
 
         if (card.SelfCard.BoostOrDamage.NearBoost == -1)
         {
@@ -389,17 +405,17 @@ public class GameManager : MonoBehaviour
                 if (card.SelfCard.StatusEffects.EnduranceOrBleedingOther != 0 && !card.SelfCard.StatusEffects.IsEnemyTargetEnduranceOrBleeding)
                 {
                     _cardMechanics.BleedingOrEndurance(card, EnemyFieldCards[i]);
-                    UIManager.Instance.CheckBleeding(EnemyFieldCards[i]);
+                    _uiManager.CheckBleeding(EnemyFieldCards[i]);
                 }
 
                 if (card.SelfCard.EndTurnActions.ArmorOther > 0)
                 {
                     EnemyFieldCards[i].SelfCard.BaseCard.ArmorPoints += card.SelfCard.EndTurnActions.ArmorOther;
-                    UIManager.Instance.CheckArmor(EnemyFieldCards[i]);
+                    _uiManager.CheckArmor(EnemyFieldCards[i]);
                 }
             }
 
-            SoundManager.Instance.EnemyStartEffectSound(card);
+            _soundManager.EnemyStartEffectSound(card);
         }
 
 
@@ -435,7 +451,7 @@ public class GameManager : MonoBehaviour
                 }
             }
 
-            SoundManager.Instance.EnemyStartEffectSound(card);
+            _soundManager.EnemyStartEffectSound(card);
         }
 
         if (card.SelfCard.BoostOrDamage.NearDamage == -1)
@@ -456,7 +472,7 @@ public class GameManager : MonoBehaviour
                 }
             }
 
-            SoundManager.Instance.EnemyStartEffectSound(card);
+            _soundManager.EnemyStartEffectSound(card);
         }
 
         else if ((card.SelfCard.BoostOrDamage.Damage != 0) && (PlayerFieldCards.Count != 0) && ((PlayerFieldCards.Count - PlayerFieldInvulnerabilityCards.Count) > 0))
@@ -504,7 +520,7 @@ public class GameManager : MonoBehaviour
             }
 
             if (!card.SelfCard.BoostOrDamage.AddictionWithEnemyField)
-                SoundManager.Instance.EnemyStartEffectSound(card);
+                _soundManager.EnemyStartEffectSound(card);
         }
 
         if ((card.SelfCard.BoostOrDamage.SelfBoost != 0 || card.SelfCard.BoostOrDamage.SelfDamage != 0) && ((!card.SelfCard.BoostOrDamage.AddictionWithAlliedField && !card.SelfCard.BoostOrDamage.AddictionWithEnemyField) ||
@@ -512,12 +528,12 @@ public class GameManager : MonoBehaviour
            (card.SelfCard.BoostOrDamage.AddictionWithEnemyField && ((PlayerFieldCards.Count - PlayerFieldInvulnerabilityCards.Count) > 0)))))
         {
             _cardMechanics.Self(card, card);
-            SoundManager.Instance.EnemyStartEffectSound(card);
+            _soundManager.EnemyStartEffectSound(card);
         }
 
         if (card.SelfCard.Spawns.SpawnCardCount != 0 && (!card.SelfCard.BoostOrDamage.AddictionWithEnemyField) || (card.SelfCard.BoostOrDamage.AddictionWithEnemyField && PlayerFieldCards.Count > 0))
         {
-            SoundManager.Instance.EnemyStartEffectSound(card);
+            _soundManager.EnemyStartEffectSound(card);
             _cardMechanics.SpawnCard(card, false);
             ChangeEnemyPoints();
         }
@@ -579,14 +595,14 @@ public class GameManager : MonoBehaviour
             {
                 botChoosedCard = ChooseCard(false, false);
                 _cardMechanics.BleedingOrEndurance(card, botChoosedCard);
-                UIManager.Instance.CheckBleeding(botChoosedCard);
+                _uiManager.CheckBleeding(botChoosedCard);
             }
 
             else if (card.SelfCard.BoostOrDamage.NearDamage != -1 && (EnemyFieldCards.Count - EnemyFieldInvulnerabilityCards.Count) > 1)
             {
                 botChoosedCard = ChooseCard(false, true);
                 _cardMechanics.BleedingOrEndurance(card, botChoosedCard);
-                UIManager.Instance.CheckBleeding(botChoosedCard);
+                _uiManager.CheckBleeding(botChoosedCard);
             }
 
         }
@@ -645,7 +661,7 @@ public class GameManager : MonoBehaviour
 
         _cardMechanics.CheckStatusEffects(card);
 
-        SoundManager.Instance.PlayerDeploymentSound(card);
+        _soundManager.PlayerDeploymentSound(card);
 
         if (card.SelfCard.BoostOrDamage.NearBoost == -1)
         {
@@ -656,17 +672,17 @@ public class GameManager : MonoBehaviour
                 if (card.SelfCard.StatusEffects.EnduranceOrBleedingOther != 0 && !card.SelfCard.StatusEffects.IsEnemyTargetEnduranceOrBleeding)
                 {
                     _cardMechanics.BleedingOrEndurance(card, PlayerFieldCards[i]);
-                    UIManager.Instance.CheckBleeding(PlayerFieldCards[i]);
+                    _uiManager.CheckBleeding(PlayerFieldCards[i]);
                 }
 
                 if (card.SelfCard.EndTurnActions.ArmorOther > 0)
                 {
                     PlayerFieldCards[i].SelfCard.BaseCard.ArmorPoints += card.SelfCard.EndTurnActions.ArmorOther;
-                    UIManager.Instance.CheckArmor(PlayerFieldCards[i]);
+                    _uiManager.CheckArmor(PlayerFieldCards[i]);
                 }
             }
 
-            SoundManager.Instance.PlayerStartEffectSound(card);
+            _soundManager.PlayerStartEffectSound(card);
         }
 
         else if ((card.SelfCard.BoostOrDamage.Boost != 0) && PlayerFieldCards.Count != 1 && ((PlayerFieldCards.Count - PlayerFieldInvulnerabilityCards.Count) > 1))
@@ -697,7 +713,7 @@ public class GameManager : MonoBehaviour
                 }
             }
 
-            SoundManager.Instance.PlayerStartEffectSound(card);
+            _soundManager.PlayerStartEffectSound(card);
         }
 
         else if ((card.SelfCard.BoostOrDamage.Damage != 0) && (EnemyFieldCards.Count != 0) && ((EnemyFieldCards.Count - EnemyFieldInvulnerabilityCards.Count) > 0))
@@ -716,24 +732,24 @@ public class GameManager : MonoBehaviour
 
             ChangePlayerPoints();
 
-            SoundManager.Instance.PlayerStartEffectSound(card);
+            _soundManager.PlayerStartEffectSound(card);
         }
 
         if (card.SelfCard.Spawns.SpawnCardCount != 0 && !card.SelfCard.BoostOrDamage.AddictionWithEnemyField)
         {
-            SoundManager.Instance.PlayerStartEffectSound(card);
+            _soundManager.PlayerStartEffectSound(card);
             _cardMechanics.SpawnCard(card, true);
             ChangePlayerPoints();
         }
 
         if (card.SelfCard.DrawCard.DrawCardCount != 0)
         {
-            UIManager.Instance.ChangeEndTurnButtonInteractable(false);
+            _uiManager.ChangeEndTurnButtonInteractable(false);
             for (int i = 0; i < card.SelfCard.DrawCard.DrawCardCount; i++)
             {
                 yield return StartCoroutine(GiveCardtoHand(CurrentGame.PlayerDeck, _playerHand, TimeDrawCard, true));
             }
-            UIManager.Instance.ChangeEndTurnButtonInteractable(true);
+            _uiManager.ChangeEndTurnButtonInteractable(true);
         }
 
         if (card.SelfCard.UniqueMechanics.DestroyCardPoints != 0)
@@ -819,7 +835,7 @@ public class GameManager : MonoBehaviour
 
             CardsCanChooseOnWickEnd.Remove(playedCard);
 
-            UIManager.Instance.ChangeLineColor(Color.white, Color.red);
+            _uiManager.ChangeLineColor(Color.white, Color.red);
 
         }
 
@@ -840,7 +856,7 @@ public class GameManager : MonoBehaviour
             playedCard.transform.GetComponent<ChoseCard>().enabled = false;
             CardsCanChooseOnWickEnd.Remove(playedCard);
 
-            UIManager.Instance.ChangeLineColor(Color.white, Color.green);
+            _uiManager.ChangeLineColor(Color.white, Color.green);
         }
     }
 
@@ -879,7 +895,7 @@ public class GameManager : MonoBehaviour
             _enemyPoints += card.ShowPoints(card.SelfCard);
         }
 
-        UIManager.Instance.ChangePoints(_playerPoints, _enemyPoints);
+        _uiManager.ChangePoints(_playerPoints, _enemyPoints);
     }
 
     private void ChangePlayerPoints()
@@ -891,7 +907,7 @@ public class GameManager : MonoBehaviour
             _playerPoints += card.ShowPoints(card.SelfCard);
         }
 
-        UIManager.Instance.ChangePoints(_playerPoints, _enemyPoints);
+        _uiManager.ChangePoints(_playerPoints, _enemyPoints);
     }
 
     private CardInfoScript ChooseCard(bool isPlayerChoose, bool isFriendlyCard = true)
@@ -935,7 +951,7 @@ public class GameManager : MonoBehaviour
     {
         StartChoseCard = playedCard;
         playedCard.ImageEdge1.color = Color.green;
-        UIManager.Instance.ChangeEndTurnButtonInteractable(false);
+        _uiManager.ChangeEndTurnButtonInteractable(false);
 
         yield return StartCoroutine(WaitForChoseCard(playedCard));
         IsChooseCard = false;
@@ -1054,7 +1070,7 @@ public class GameManager : MonoBehaviour
         if (isEnduranceOrBleeding)
         {
             _cardMechanics.BleedingOrEndurance(playedCard, ChooseCard(true));
-            UIManager.Instance.CheckBleeding(ChooseCard(true));
+            _uiManager.CheckBleeding(ChooseCard(true));
 
             if (isEnduranceOrBleedingEnemy)
                 RemovePrepareToChoseCard(true);
@@ -1062,16 +1078,16 @@ public class GameManager : MonoBehaviour
                 RemovePrepareToChoseCard(false);
         }
 
-        UIManager.Instance.ChangeLinePosition(0, Vector3.zero);
-        UIManager.Instance.ChangeLinePosition(1, Vector3.zero);
+        _uiManager.ChangeLinePosition(0, Vector3.zero);
+        _uiManager.ChangeLinePosition(1, Vector3.zero);
 
         playedCard.ImageEdge1.color = Color.white;
-        UIManager.Instance.ChangeEndTurnButtonInteractable(true);
+        _uiManager.ChangeEndTurnButtonInteractable(true);
 
         ChangeEnemyPoints();
         ChangePlayerPoints();
 
-        SoundManager.Instance.PlayerStartEffectSound(playedCard);
+        _soundManager.PlayerStartEffectSound(playedCard);
     }
 
     private IEnumerator WaitForChoseCard(CardInfoScript card)
@@ -1081,8 +1097,8 @@ public class GameManager : MonoBehaviour
 
         while (_choosenCard == null)
         {
-            UIManager.Instance.ChangeLinePosition(0, new Vector3(card.transform.position.x, card.transform.position.y, 1));
-            UIManager.Instance.ChangeLinePosition(1, _mainCamera.ScreenToWorldPoint(new Vector3(Input.mousePosition.x, Input.mousePosition.y, 1)));
+            _uiManager.ChangeLinePosition(0, new Vector3(card.transform.position.x, card.transform.position.y, 1));
+            _uiManager.ChangeLinePosition(1, _mainCamera.ScreenToWorldPoint(new Vector3(Input.mousePosition.x, Input.mousePosition.y, 1)));
 
             yield return null;
         }
@@ -1144,7 +1160,7 @@ public class GameManager : MonoBehaviour
         _playerPoints = 0;
         _enemyPoints = 0;
 
-        UIManager.Instance.ChangePoints(_playerPoints, _enemyPoints);
+        _uiManager.ChangePoints(_playerPoints, _enemyPoints);
 
         for (int i = EnemyHandCards.Count - 1; i >= 0; i--)
         {
@@ -1178,7 +1194,7 @@ public class GameManager : MonoBehaviour
         _isPlayerPassed = false;
         _isEnemyPassed = false;
 
-        CurrentGame = new Game();
+        CurrentGame = new Game(this);
 
         Deck.Instance.DeleteDeck();
         Deck.Instance.CreateDeck(CurrentGame.PlayerDeck);
@@ -1186,7 +1202,7 @@ public class GameManager : MonoBehaviour
         StartCoroutine(GiveHandCards(CurrentGame.EnemyDeck, _enemyHand, false));
         StartCoroutine(GiveHandCards(CurrentGame.PlayerDeck, _playerHand, true));
 
-        UIManager.Instance.ChangeEndTurnButtonInteractable(true);
+        _uiManager.ChangeEndTurnButtonInteractable(true);
 
         AllCoroutine.Add(StartCoroutine(TurnFunk()));
     }
@@ -1206,6 +1222,7 @@ public class GameManager : MonoBehaviour
         if (isPlayer)
         {
             PlayerHandCards.Remove(card);
+            IsHandCardPlaying = true;
         }
         else
         {

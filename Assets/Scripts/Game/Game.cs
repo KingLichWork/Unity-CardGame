@@ -7,8 +7,12 @@ public class Game
     public List<Card> EnemyDeck;
     public List<Card> PlayerDeck;
 
-    public Game()
+    private GameManager _gameManager;
+
+    public Game(GameManager gameManager)
     {
+        _gameManager = gameManager;
+
         EnemyDeck = GiveDeckCard();
 
         if (Object.FindObjectOfType<DeckManager>() != null && DeckManager.Instance.Deck != null)
@@ -39,7 +43,7 @@ public class Game
     private List<Card> GiveDeckCard()
     {
         List<Card> DeckList = new List<Card>();
-        for (int i = 0; i < GameManager.Instance.ValueDeckCards; i++)
+        for (int i = 0; i < _gameManager.ValueDeckCards; i++)
         {
             DeckList.Add(CardManagerList.AllCards[Random.Range(0, CardManagerList.AllCards.Count)]);
             //DeckList.Add(CardManagerList.AllCards[45]);

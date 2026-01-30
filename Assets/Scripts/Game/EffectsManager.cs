@@ -6,21 +6,6 @@ using UnityEngine;
 
 public class EffectsManager : MonoBehaviour
 {
-    private static EffectsManager _instance;
-
-    public static EffectsManager Instance
-    {
-        get
-        {
-            if (_instance == null)
-            {
-                _instance = FindObjectOfType<EffectsManager>();
-            }
-
-            return _instance;
-        }
-    }
-
     public Material DestroyMaterial;
     public Material ShieldMaterial;
     public Material IllusionMaterial;
@@ -41,14 +26,6 @@ public class EffectsManager : MonoBehaviour
 
     [SerializeField] private ParticleSystem[] _boostParticle;
     [SerializeField] private ParticleSystem[] _boostBurstParticle;
-
-    private void Awake()
-    {
-        if (_instance == null)
-        {
-            _instance = this;
-        }
-    }
 
     public void DrawCardEffect(float time, Transform Hand, bool isPlayer)
     {

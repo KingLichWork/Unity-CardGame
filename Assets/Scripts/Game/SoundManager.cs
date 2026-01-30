@@ -1,36 +1,13 @@
-using UnityEngine;
+﻿using UnityEngine;
 
 public class SoundManager : MonoBehaviour
 {
-    private static SoundManager _instance;
-
-    public static SoundManager Instance
-    {
-        get
-        {
-            if (_instance == null)
-            {
-                _instance = FindObjectOfType<SoundManager>();
-            }
-
-            return _instance;
-        }
-    }
-
     [SerializeField] private AudioSource _deploymentPlayerAudioSource;
     [SerializeField] private AudioSource _deploymentEnemyAudioSource;
     [SerializeField] private AudioSource _startPlayerTargetAudioSource;
     [SerializeField] private AudioSource _startEnemyTargetAudioSource;
     [SerializeField] private AudioSource _endTurnAudioSource;
     [SerializeField] private AudioSource _timerAudioSource;
-
-    private void Awake()
-    {
-        if (_instance == null)
-        {
-            _instance = this;
-        }
-    }
 
     public void PlayerDeploymentSound(CardInfoScript card)
     {

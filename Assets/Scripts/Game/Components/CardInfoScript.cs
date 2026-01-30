@@ -121,7 +121,8 @@ public class CardInfoScript : MonoBehaviour
 
     public void ShowDescription()
     {
-        if ((IsDeckBuildCard) || ((!IsHideCard) && (!GameManager.Instance.IsStartGiveCards) && (!GameManager.Instance.IsDrag) && (!IsAnimationCard) && (!IsOrderCard) && (DescriptionObject != null)))
+        if ((IsDeckBuildCard) || ((!IsHideCard) && (!GameManager.IsStartGiveCards) 
+            && (!GameManager.IsDrag) && (!IsAnimationCard) && (!IsOrderCard) && (DescriptionObject != null)))
         {
             switch (Description.text.Length)
             {

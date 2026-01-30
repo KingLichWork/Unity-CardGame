@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using VContainer;
 
 public class HowToPlay : MonoBehaviour
 {
@@ -27,6 +28,14 @@ public class HowToPlay : MonoBehaviour
     private GameObject HowToPlayGameFon;
 
     public bool IsHowToPlay => _isHowToPlay;
+
+    private GameManager _gameManager;
+
+    [Inject]
+    private void Construct(GameManager gameManager)
+    {
+        _gameManager = gameManager;
+    }
 
     private void Awake()
     {

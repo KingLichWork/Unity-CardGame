@@ -1,4 +1,5 @@
-using DG.Tweening;
+﻿using DG.Tweening;
+using System;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.EventSystems;
@@ -17,8 +18,8 @@ public class CardMove : MonoBehaviour, IBeginDragHandler, IEndDragHandler, IDrag
     [HideInInspector] public Transform CurrentCardParentTransform;
     [HideInInspector] public Transform FutureCardParentTransform;
 
-    [HideInInspector] public UnityEvent ChangeCardPosition;
-    [HideInInspector] public UnityEvent HideEmptyCard;
+    public event Action ChangeCardPosition;
+    public event Action HideEmptyCard;
 
     private void Awake()
     {
@@ -33,11 +34,12 @@ public class CardMove : MonoBehaviour, IBeginDragHandler, IEndDragHandler, IDrag
         CurrentCardParentTransform = transform.parent;
         FutureCardParentTransform = transform.parent;
 
-        IsDraggable = ((CurrentCardParentTransform.GetComponent<DropField>().TypeField == TypeField.SELF_HAND) && (GameManager.Instance.IsPlayerTurn) && (!GameManager.Instance.IsChoosing) && (!GameManager.Instance.IsHandCardPlaying));
+        IsDraggable = ((CurrentCardParentTransform.GetComponent<DropField>().TypeField == TypeField.SELF_HAND) 
+            && (GameManager.Instance.IsPlayerTurn) && (!GameManager.IsChoosing) && (!GameManager.IsHandCardPlaying));
 
         if (!IsDraggable) return;
 
-        GameManager.Instance.IsDrag = true;
+        GameManager.IsDrag = true;
 
         StartSiblingIndex = transform.GetSiblingIndex();
         transform.SetParent(CurrentCardParentTransform.parent.parent);
@@ -56,7 +58,7 @@ public class CardMove : MonoBehaviour, IBeginDragHandler, IEndDragHandler, IDrag
     {
         if (!IsDraggable) return;
 
-        GameManager.Instance.IsDrag = false;
+        GameManager.IsDrag = false;
 
         HideEmptyCard.Invoke();
 
@@ -68,8 +70,8 @@ public class CardMove : MonoBehaviour, IBeginDragHandler, IEndDragHandler, IDrag
             transform.SetSiblingIndex(StartSiblingIndex);
         }
 
-        ChangeCardPosition.RemoveAllListeners();
-        HideEmptyCard.RemoveAllListeners();
+        ChangeCardPosition = null;
+        HideEmptyCard = null;
     }
 
     private void ChangePosition()
