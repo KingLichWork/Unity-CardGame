@@ -117,7 +117,7 @@ public class DropField : MonoBehaviour, IPointerEnterHandler, IPointerExitHandle
         {
             if (TypeField == TypeField.SELF_TABLE && !cardInfo.SelfCard.StatusEffects.IsInvisibility)
             {
-                if (GameManager.Instance.PlayerFieldCards.Count >= GameManager.MaxNumberCardInField)
+                if (GameManager.Instance.Player.Field.Cards.Count >= GameManager.MaxNumberCardInField)
                 {
                     ThrowCardAction.Invoke(cardInfo, true);
 
@@ -137,7 +137,7 @@ public class DropField : MonoBehaviour, IPointerEnterHandler, IPointerExitHandle
 
             else if (TypeField == TypeField.ENEMY_TABLE && cardInfo.SelfCard.StatusEffects.IsInvisibility)
             {
-                if (GameManager.Instance.EnemyFieldCards.Count >= GameManager.MaxNumberCardInField)
+                if (GameManager.Instance.Enemy.Field.Cards.Count >= GameManager.MaxNumberCardInField)
                 {
                     ThrowCardAction.Invoke(cardInfo, true);
 
