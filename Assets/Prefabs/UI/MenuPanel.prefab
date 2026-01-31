@@ -437,7 +437,6 @@ GameObject:
   - component: {fileID: 76297710433502172}
   - component: {fileID: 1656228910720336037}
   - component: {fileID: 3153574474290190209}
-  - component: {fileID: 6818210899061499694}
   m_Layer: 5
   m_Name: Name
   m_TagString: Untagged
@@ -561,21 +560,6 @@ MonoBehaviour:
   m_hasFontAssetChanged: 0
   m_baseMaterial: {fileID: 0}
   m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
---- !u!114 &6818210899061499694
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3662663585340423895}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d1c5d80a7f7dd964ab14a05840c7aa91, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _isIdentically: 1
-  _en: Dota Card Game
-  _ru: 
 --- !u!1 &5051569412973968203
 GameObject:
   m_ObjectHideFlags: 0

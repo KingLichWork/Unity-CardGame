@@ -90,7 +90,7 @@ public class CardMove : MonoBehaviour, IBeginDragHandler, IEndDragHandler, IDrag
         }
 
         SiblingIndex = newIndex;
-        ChangeCardPosition.Invoke();
+        ChangeCardPosition?.Invoke();
     }
 
     public void EnemyMoveToField(Transform field)

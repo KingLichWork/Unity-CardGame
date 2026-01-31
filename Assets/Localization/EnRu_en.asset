@@ -146,6 +146,14 @@ MonoBehaviour:
     m_Localized: Pass
     m_Metadata:
       m_Items: []
+  - m_Id: 375621048836096
+    m_Localized: Restart
+    m_Metadata:
+      m_Items: []
+  - m_Id: 375694902140928
+    m_Localized: To DeckBuild
+    m_Metadata:
+      m_Items: []
   references:
     version: 2
     RefIds: []

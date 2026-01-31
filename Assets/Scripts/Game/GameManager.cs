@@ -77,10 +77,13 @@ public class GameManager : MonoBehaviour
     private EffectsManager _effectsManager;
     private SoundManager _soundManager;
 
+    private CardSelectionService _сardSelectionService;
+
     public PlayerState Player { get; private set; }
     public PlayerState Enemy { get; private set; }
 
     public static event Action HideEndGamePanel;
+    public static event Action<int, int> ChangePoints;
 
     public bool IsPlayerTurn
     {
@@ -88,25 +91,25 @@ public class GameManager : MonoBehaviour
     }
 
     [Inject]
-    private void Construct(IObjectResolver objectResolver, CardMechanics cardMechanics, UIManager uiManager, EffectsManager effectsManager, SoundManager soundManager)
+    private void Construct(IObjectResolver objectResolver, CardMechanics cardMechanics, UIManager uiManager, 
+        EffectsManager effectsManager, SoundManager soundManager, CardSelectionService сardSelectionService)
     {
         _objectResolver = objectResolver;
         _cardMechanics = cardMechanics;
         _uiManager = uiManager;
         _effectsManager = effectsManager;
         _soundManager = soundManager;
+        _сardSelectionService = сardSelectionService;
     }
 
     private void OnEnable()
     {
-        DropField.DropCardAction += PlayerDropCardStartCoroutine;
         DropField.DropCardAction += PlayerDropCardStartCoroutine;
         DropField.ThrowCardAction += ThrowCard;
     }
 
     private void OnDisable()
     {
-        DropField.DropCardAction -= PlayerDropCardStartCoroutine;
         DropField.DropCardAction -= PlayerDropCardStartCoroutine;
         DropField.ThrowCardAction -= ThrowCard;
     }
@@ -799,7 +802,6 @@ public class GameManager : MonoBehaviour
                 PrepareToChoseCard(card, true);
                 AllCoroutine.Add(StartCoroutine(ChoseCardCoroutine(card, isEnduranceOrBleeding: true, isEnduranceOrBleedingEnemy: true)));
             }
-
             else if (card.SelfCard.BoostOrDamage.NearBoost != -1 && (Player.Field.Cards.Count - Player.Field.InvulnerabilityCards.Count) > 1)
             {
                 PrepareToChoseCard(card, false);
@@ -808,9 +810,7 @@ public class GameManager : MonoBehaviour
         }
 
         if (card.SelfCard.UniqueMechanics.TransformationCardName != "")
-        {
             _cardMechanics.Transformation(card);
-        }
 
         ChangeEnemyPoints();
         ChangePlayerPoints();
@@ -837,7 +837,6 @@ public class GameManager : MonoBehaviour
             _uiManager.ChangeLineColor(Color.white, Color.red);
 
         }
-
         else
         {
             foreach (CardInfoScript playerFieldCard in Player.Field.Cards)
@@ -871,7 +870,6 @@ public class GameManager : MonoBehaviour
                 enemyFieldCard.IsOrderCard = false;
             }
         }
-
         else
         {
             foreach (CardInfoScript playerFieldCard in Player.Field.Cards)
@@ -894,7 +892,7 @@ public class GameManager : MonoBehaviour
             _enemyPoints += card.ShowPoints(card.SelfCard);
         }
 
-        _uiManager.ChangePoints(_playerPoints, _enemyPoints);
+        ChangePoints.Invoke(_playerPoints, _enemyPoints);
     }
 
     private void ChangePlayerPoints()
@@ -906,7 +904,7 @@ public class GameManager : MonoBehaviour
             _playerPoints += card.ShowPoints(card.SelfCard);
         }
 
-        _uiManager.ChangePoints(_playerPoints, _enemyPoints);
+        ChangePoints.Invoke(_playerPoints, _enemyPoints);
     }
 
     private CardInfoScript ChooseCard(bool isPlayerChoose, bool isFriendlyCard = true)
@@ -1107,6 +1105,7 @@ public class GameManager : MonoBehaviour
 
     public void ChoseCard(CardInfoScript card)
     {
+        //_сardSelectionService.SetChosen(card);
         _choosenCard = card;
     }
 
@@ -1161,7 +1160,7 @@ public class GameManager : MonoBehaviour
         _playerPoints = 0;
         _enemyPoints = 0;
 
-        _uiManager.ChangePoints(_playerPoints, _enemyPoints);
+        ChangePoints.Invoke(_playerPoints, _enemyPoints);
 
         for (int i = Enemy.Hand.Cards.Count - 1; i >= 0; i--)
         {

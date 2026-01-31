@@ -245,13 +245,13 @@ public class CardView : MonoBehaviour, IPointerClickHandler
 
         int height = (countStatuseffects * 200 + (countStatuseffects - 1) * 20) + 20;
 
+        RectTransform cardDescription = CardViewDescriptionParent.GetComponent<RectTransform>();
+
         if (height > 780)
         {
-            CardViewDescriptionParent.GetComponent<RectTransform>().sizeDelta = new Vector2(CardViewDescriptionParent.GetComponent<RectTransform>().sizeDelta.x, height);
+            cardDescription.sizeDelta = new Vector2(CardViewDescriptionParent.GetComponent<RectTransform>().sizeDelta.x, height - 780);
             CardViewDescriptionView.verticalScrollbar.value = 1;
         }
-        else
-            CardViewDescriptionParent.GetComponent<RectTransform>().sizeDelta = new Vector2(CardViewDescriptionParent.GetComponent<RectTransform>().sizeDelta.x, 0);
     }
 
     public void ShowPoints(bool IsCurrentPoints)

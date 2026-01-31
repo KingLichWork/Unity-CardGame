@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using UnityEngine;
 
 public class FieldZone : ICardZone
 {
@@ -27,7 +28,7 @@ public class FieldZone : ICardZone
     public void Add(CardInfoScript card)
     {
         if (!CanAdd(card))
-            throw new InvalidOperationException("Field is full");
+            Debug.Log("Field is full");
 
         _cards.Add(card);
     }

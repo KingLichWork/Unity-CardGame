@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using UnityEngine;
 
 public class HandZone : ICardZone
 {
@@ -19,7 +20,7 @@ public class HandZone : ICardZone
     public void Add(CardInfoScript card)
     {
         if (!CanAdd(card))
-            throw new InvalidOperationException("Hand is full");
+            Debug.Log("Hand is full");
 
         _cards.Add(card);
     }
