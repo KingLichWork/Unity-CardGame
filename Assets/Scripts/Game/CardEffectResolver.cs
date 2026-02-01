@@ -78,7 +78,6 @@ public class CardEffectResolver
         return validTargets > 1;
     }
 
-
     public void HandleDamage(CardInfoScript card, EffectOwner owner)
     {
         var dmg = card.SelfCard.BoostOrDamage;
@@ -88,7 +87,9 @@ public class CardEffectResolver
 
         var opponent = GetOpponentState(owner);
 
-        foreach (var target in opponent.Field.Cards)
+        var targets = new List<CardInfoScript>(opponent.Field.Cards);
+
+        foreach (var target in targets)
         {
             _cardMechanics.Deployment(target, card);
 
@@ -138,7 +139,7 @@ public class CardEffectResolver
         }
     }
 
-    public void HandleSpawn(CardInfoScript card)
+    public void HandleSpawn(CardInfoScript card, EffectOwner effectOwner)
     {
         if (card.SelfCard.Spawns.SpawnCardCount == 0)
             return;
@@ -147,7 +148,7 @@ public class CardEffectResolver
             return;
 
         _soundManager.StartEffectSound(card);
-        _cardMechanics.SpawnCard(card, true);
+        _cardMechanics.SpawnCard(card, effectOwner == EffectOwner.Player);
     }
 
     public bool HandleDestroy(CardInfoScript card)

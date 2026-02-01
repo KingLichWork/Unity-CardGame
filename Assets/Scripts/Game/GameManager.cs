@@ -360,7 +360,7 @@ public class GameManager : MonoBehaviour
 
     private IEnumerator EnemyDropCard(CardInfoScript card)
     {
-        yield return new WaitForSeconds(0.3f);
+        yield return new WaitForSeconds(0.1f);
 
         EnemyState.Hand.Remove(card);
 
@@ -396,7 +396,7 @@ public class GameManager : MonoBehaviour
             _cardEffectResolver.HandleDamage(card, EffectOwner.Enemy);
 
         _cardEffectResolver.HandleSelf(card);
-        _cardEffectResolver.HandleSpawn(card);
+        _cardEffectResolver.HandleSpawn(card, EffectOwner.Enemy);
 
         yield return HandleEnemyDraw(card);
 
@@ -488,7 +488,7 @@ public class GameManager : MonoBehaviour
             _cardEffectResolver.HandleDamage(card, EffectOwner.Player);
 
         _cardEffectResolver.HandleSelf(card);
-        _cardEffectResolver.HandleSpawn(card);
+        _cardEffectResolver.HandleSpawn(card, EffectOwner.Player);
     }
 
     private void HandleUniqueMechanics(CardInfoScript card)
