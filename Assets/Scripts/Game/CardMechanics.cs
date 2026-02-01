@@ -243,11 +243,11 @@ public class CardMechanics
                 card.gameObject.transform.parent = card.transform.parent.parent;
                 card.gameObject.SetActive(false);
 
-                if (GameManager.Instance.Player.Field.Cards.Contains(card))
-                    GameManager.Instance.Player.Field.DestroyedInEndTurnCards.Add(card);
+                if (GameManager.Instance.PlayerState.Field.Cards.Contains(card))
+                    GameManager.Instance.PlayerState.Field.DestroyedInEndTurnCards.Add(card);
 
-                else if (GameManager.Instance.Enemy.Field.Cards.Contains(card))
-                    GameManager.Instance.Enemy.Field.DestroyedInEndTurnCards.Add(card);
+                else if (GameManager.Instance.EnemyState.Field.Cards.Contains(card))
+                    GameManager.Instance.EnemyState.Field.DestroyedInEndTurnCards.Add(card);
             }
         }
     }
@@ -261,17 +261,17 @@ public class CardMechanics
             _effectsManager.StartParticleEffects(startCard.transform, card.transform, -1);
         }
 
-        if (GameManager.Instance.Player.Field.Cards.Contains(card))
-            GameManager.Instance.Player.Field.Remove(card);
+        if (GameManager.Instance.PlayerState.Field.Cards.Contains(card))
+            GameManager.Instance.PlayerState.Field.Remove(card);
 
-        else if (GameManager.Instance.Enemy.Field.Cards.Contains(card))
-            GameManager.Instance.Enemy.Field.Remove(card);
+        else if (GameManager.Instance.EnemyState.Field.Cards.Contains(card))
+            GameManager.Instance.EnemyState.Field.Remove(card);
 
-        if (GameManager.Instance.Player.Field.InvulnerabilityCards.Contains(card))
-            GameManager.Instance.Player.Field.InvulnerabilityCards.Remove(card);
+        if (GameManager.Instance.PlayerState.Field.InvulnerabilityCards.Contains(card))
+            GameManager.Instance.PlayerState.Field.InvulnerabilityCards.Remove(card);
 
-        else if (GameManager.Instance.Enemy.Field.InvulnerabilityCards.Contains(card))
-            GameManager.Instance.Enemy.Field.InvulnerabilityCards.Remove(card);
+        else if (GameManager.Instance.EnemyState.Field.InvulnerabilityCards.Contains(card))
+            GameManager.Instance.EnemyState.Field.InvulnerabilityCards.Remove(card);
 
         _effectsManager.StartDestroyCoroutine(card);
 
@@ -300,8 +300,8 @@ public class CardMechanics
     {
         if (GameManager.Instance.IsPlayerTurn)
         {
-            GameManager.Instance.Player.Field.SetCards(GameManager.Instance.EndTurnOrderCard(GameManager.Instance.Player.Field.Cards, true));
-            foreach (CardInfoScript card in GameManager.Instance.Player.Field.Cards)
+            GameManager.Instance.PlayerState.Field.SetCards(GameManager.Instance.EndTurnOrderCard(GameManager.Instance.PlayerState.Field.Cards, true));
+            foreach (CardInfoScript card in GameManager.Instance.PlayerState.Field.Cards)
             {
                 if (card.SelfCard.EndTurnActions.Timer > 0)
                 {
@@ -322,11 +322,11 @@ public class CardMechanics
 
                             EndTurn(card, isSelfOrNear: true);
 
-                            if ((card.SelfCard.EndTurnActions.EndTurnRandomDamage != 0) && (GameManager.Instance.Enemy.Field.Cards.Count - GameManager.Instance.Enemy.Field.DestroyedInEndTurnCards.Count > 0))
+                            if ((card.SelfCard.EndTurnActions.EndTurnRandomDamage != 0) && (GameManager.Instance.EnemyState.Field.Cards.Count - GameManager.Instance.EnemyState.Field.DestroyedInEndTurnCards.Count > 0))
                             {
-                                List<CardInfoScript> existingEnemyFieldCards = new List<CardInfoScript>(GameManager.Instance.Enemy.Field.Cards);
+                                List<CardInfoScript> existingEnemyFieldCards = new List<CardInfoScript>(GameManager.Instance.EnemyState.Field.Cards);
 
-                                foreach (CardInfoScript nonExistentCard in GameManager.Instance.Enemy.Field.DestroyedInEndTurnCards)
+                                foreach (CardInfoScript nonExistentCard in GameManager.Instance.EnemyState.Field.DestroyedInEndTurnCards)
                                 {
                                     existingEnemyFieldCards.Remove(nonExistentCard);
                                 }
@@ -334,11 +334,11 @@ public class CardMechanics
                                 EndTurn(card, existingEnemyFieldCards[Random.Range(0, existingEnemyFieldCards.Count)], false);
                             }
 
-                            if ((card.SelfCard.EndTurnActions.EndTurnRandomBoost != 0) && (GameManager.Instance.Player.Field.Cards.Count - GameManager.Instance.Player.Field.DestroyedInEndTurnCards.Count > 0))
+                            if ((card.SelfCard.EndTurnActions.EndTurnRandomBoost != 0) && (GameManager.Instance.PlayerState.Field.Cards.Count - GameManager.Instance.PlayerState.Field.DestroyedInEndTurnCards.Count > 0))
                             {
-                                List<CardInfoScript> existingPlayerFieldCards = new List<CardInfoScript>(GameManager.Instance.Player.Field.Cards);
+                                List<CardInfoScript> existingPlayerFieldCards = new List<CardInfoScript>(GameManager.Instance.PlayerState.Field.Cards);
 
-                                foreach (CardInfoScript nonExistentCard in GameManager.Instance.Player.Field.DestroyedInEndTurnCards)
+                                foreach (CardInfoScript nonExistentCard in GameManager.Instance.PlayerState.Field.DestroyedInEndTurnCards)
                                 {
                                     existingPlayerFieldCards.Remove(nonExistentCard);
                                 }
@@ -371,8 +371,8 @@ public class CardMechanics
 
         else
         {
-            GameManager.Instance.Enemy.Field.SetCards(GameManager.Instance.EndTurnOrderCard(GameManager.Instance.Enemy.Field.Cards, false));
-            foreach (CardInfoScript card in GameManager.Instance.Enemy.Field.Cards)
+            GameManager.Instance.EnemyState.Field.SetCards(GameManager.Instance.EndTurnOrderCard(GameManager.Instance.EnemyState.Field.Cards, false));
+            foreach (CardInfoScript card in GameManager.Instance.EnemyState.Field.Cards)
             {
                 if (card.SelfCard.EndTurnActions.Timer > 0)
                 {
@@ -389,11 +389,11 @@ public class CardMechanics
                         {
                             EndTurn(card, isSelfOrNear: true);
 
-                            if ((card.SelfCard.EndTurnActions.EndTurnRandomDamage != 0) && (GameManager.Instance.Player.Field.Cards.Count - GameManager.Instance.Player.Field.DestroyedInEndTurnCards.Count > 0))
+                            if ((card.SelfCard.EndTurnActions.EndTurnRandomDamage != 0) && (GameManager.Instance.PlayerState.Field.Cards.Count - GameManager.Instance.PlayerState.Field.DestroyedInEndTurnCards.Count > 0))
                             {
-                                List<CardInfoScript> existingPlayerFieldCards = new List<CardInfoScript>(GameManager.Instance.Player.Field.Cards);
+                                List<CardInfoScript> existingPlayerFieldCards = new List<CardInfoScript>(GameManager.Instance.PlayerState.Field.Cards);
 
-                                foreach (CardInfoScript nonExistentCard in GameManager.Instance.Player.Field.DestroyedInEndTurnCards)
+                                foreach (CardInfoScript nonExistentCard in GameManager.Instance.PlayerState.Field.DestroyedInEndTurnCards)
                                 {
                                     existingPlayerFieldCards.Remove(nonExistentCard);
                                 }
@@ -401,11 +401,11 @@ public class CardMechanics
                                 EndTurn(card, existingPlayerFieldCards[Random.Range(0, existingPlayerFieldCards.Count)], false);
                             }
 
-                            if ((card.SelfCard.EndTurnActions.EndTurnRandomBoost != 0) && (GameManager.Instance.Enemy.Field.Cards.Count - GameManager.Instance.Enemy.Field.DestroyedInEndTurnCards.Count > 0))
+                            if ((card.SelfCard.EndTurnActions.EndTurnRandomBoost != 0) && (GameManager.Instance.EnemyState.Field.Cards.Count - GameManager.Instance.EnemyState.Field.DestroyedInEndTurnCards.Count > 0))
                             {
-                                List<CardInfoScript> existingEnemyFieldCards = new List<CardInfoScript>(GameManager.Instance.Enemy.Field.Cards);
+                                List<CardInfoScript> existingEnemyFieldCards = new List<CardInfoScript>(GameManager.Instance.EnemyState.Field.Cards);
 
-                                foreach (CardInfoScript nonExistentCard in GameManager.Instance.Enemy.Field.DestroyedInEndTurnCards)
+                                foreach (CardInfoScript nonExistentCard in GameManager.Instance.EnemyState.Field.DestroyedInEndTurnCards)
                                 {
                                     existingEnemyFieldCards.Remove(nonExistentCard);
                                 }
@@ -466,8 +466,8 @@ public class CardMechanics
         {
             for (int i = 0; i < card.SelfCard.Spawns.SpawnCardCount; i++)
             {
-                if (!((player && GameManager.Instance.Player.Field.Cards.Count < GameManager.MaxNumberCardInField) ||
-                    (!player && GameManager.Instance.Enemy.Field.Cards.Count < GameManager.MaxNumberCardInField)))
+                if (!((player && GameManager.Instance.PlayerState.Field.Cards.Count < GameManager.MaxNumberCardInField) ||
+                    (!player && GameManager.Instance.EnemyState.Field.Cards.Count < GameManager.MaxNumberCardInField)))
                     return;
 
                 spawnCard = _objectResolver.Instantiate(GameManager.Instance.CardPref, card.transform.parent, false);
@@ -479,8 +479,8 @@ public class CardMechanics
                 else
                     spawnCard.transform.SetSiblingIndex(card.SiblingIndex + 1);
 
-                if (player) GameManager.Instance.Player.Field.Add(summonCardInfo);
-                else GameManager.Instance.Enemy.Field.Add(summonCardInfo);
+                if (player) GameManager.Instance.PlayerState.Field.Add(summonCardInfo);
+                else GameManager.Instance.EnemyState.Field.Add(summonCardInfo);
                 summonCardInfo.ShowCardInfo(card.SelfCard);
                 summonCardInfo.SelfCard.StatusEffects.IsIllusion = true;
                 CheckStatusEffects(summonCardInfo);
@@ -495,8 +495,8 @@ public class CardMechanics
         {
             for (int i = 0; i < card.SelfCard.Spawns.SpawnCardCount; i++)
             {
-                if (!((player && GameManager.Instance.Player.Field.Cards.Count < GameManager.MaxNumberCardInField) ||
-                (!player && GameManager.Instance.Enemy.Field.Cards.Count < GameManager.MaxNumberCardInField)))
+                if (!((player && GameManager.Instance.PlayerState.Field.Cards.Count < GameManager.MaxNumberCardInField) ||
+                (!player && GameManager.Instance.EnemyState.Field.Cards.Count < GameManager.MaxNumberCardInField)))
                     return;
 
                 spawnCard = _objectResolver.Instantiate(GameManager.Instance.CardPref, card.transform.parent, false);
@@ -508,8 +508,8 @@ public class CardMechanics
                 else
                     spawnCard.transform.SetSiblingIndex(card.SiblingIndex + 1);
 
-                if (player) GameManager.Instance.Player.Field.Add(summonCardInfo);
-                else GameManager.Instance.Enemy.Field.Add(summonCardInfo);
+                if (player) GameManager.Instance.PlayerState.Field.Add(summonCardInfo);
+                else GameManager.Instance.EnemyState.Field.Add(summonCardInfo);
                 summonCardInfo.ShowCardInfo(CardManagerList.FindCard(card.SelfCard.Spawns.SpawnCardName));
 
                 ChoseCard choseCard = spawnCard.AddComponent<ChoseCard>();

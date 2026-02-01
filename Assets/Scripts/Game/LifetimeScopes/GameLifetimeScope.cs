@@ -10,15 +10,17 @@ public class GameLifetimeScope : LifetimeScope
     [SerializeField] private EndGamePanel _endGamePanel;
     [SerializeField] private InputController _inputController;
     [SerializeField] private SoundManager _soundManager;
-    //[SerializeField] private HowToPlay _howToPlay;
     [SerializeField] private EffectsManager _effectsManager;
     [SerializeField] private CardView _cardView;
+
+    //[SerializeField] private HowToPlay _howToPlay;
 
     protected override void Configure(IContainerBuilder builder)
     {
         builder.Register<CardMechanics>(Lifetime.Singleton);
         builder.Register<CardSelectionService>(Lifetime.Singleton);
         builder.Register<LocalizationManager>(Lifetime.Singleton);
+        builder.Register<CardEffectResolver>(Lifetime.Singleton);
 
         builder.RegisterComponent(_gameManager);
         builder.RegisterComponent(_uiManager);
