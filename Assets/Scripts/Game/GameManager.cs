@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using VContainer;
-using static UnityEngine.EventSystems.EventTrigger;
 using Object = UnityEngine.Object;
 using Random = UnityEngine.Random;
 
@@ -34,10 +33,10 @@ public class GameManager : MonoBehaviour
     public GameObject HowToPlayFon;
 
     //ChangeGameCharacteristics
+    public static int TurnDuration = 30;
     public static int MaxNumberCardInField = 10;
-    public int ValueHandCards = 10;
-    public int TurnDuration = 30;
-    public int ValueDeckCards = 20;
+    public static int ValueHandCards = 10;
+    public static int ValueDeckCards = 20;
 
     public float TimeDrawCardStart = 0.15f;
     public float TimeDrawCard = 0.3f;
@@ -158,7 +157,7 @@ public class GameManager : MonoBehaviour
 
         _cardEffectResolver.Initialize(PlayerState, EnemyState);
 
-        CurrentGame = new Game(this);
+        CurrentGame = new Game();
 
         _uiManager.ChangeEndTurnButtonInteractable(false);
 
@@ -167,8 +166,8 @@ public class GameManager : MonoBehaviour
 
         IsStartGiveCards = true;
 
-        StartCoroutine(GiveHandCards(CurrentGame.EnemyDeck, _enemyHand, false, true));
-        yield return StartCoroutine(GiveHandCards(CurrentGame.PlayerDeck, _playerHand, true, true));
+        StartCoroutine(GiveHandCards(CurrentGame.EnemyDeck, EffectOwner.Enemy, true));
+        yield return StartCoroutine(GiveHandCards(CurrentGame.PlayerDeck, EffectOwner.Player, true));
         _effectsManager.HideDrawCardEffect();
 
         if (Object.FindObjectOfType<HowToPlay>() != null && HowToPlay.Instance.IsHowToPlay)
@@ -183,53 +182,52 @@ public class GameManager : MonoBehaviour
         _uiManager.ChangeEndTurnButtonInteractable(true);
     }
 
-    private IEnumerator GiveHandCards(List<Card> deck, Transform hand, bool isPlayer, bool isStart = false)
+    private IEnumerator GiveHandCards(List<Card> deck, EffectOwner owner, bool isStart = false)
     {
-        int i = 0;
-        while (i++ < ValueHandCards)
+        for (int i = 0; i < ValueHandCards && deck.Count > 0; i++)
         {
-            yield return StartCoroutine(GiveCardtoHand(deck, hand, TimeDrawCardStart, isPlayer, isStart));
+            yield return StartCoroutine(GiveCardToHand(deck, owner, isStart));
         }
     }
 
-    private IEnumerator GiveCardtoHand(List<Card> deck, Transform hand, float time, bool isPlayer, bool isStart = false)
+    private IEnumerator GiveCardToHand(List<Card> deck, EffectOwner owner, bool isStart = false)
     {
         if (deck.Count == 0)
             yield break;
 
+        var state = owner == EffectOwner.Player ? PlayerState : EnemyState;
+        var handTransform = owner == EffectOwner.Player ? _playerHand : _enemyHand;
+
         Card card = deck[0];
 
-        _effectsManager.DrawCardEffect(time, hand, isPlayer);
-
-        yield return new WaitForSeconds(time);
+        yield return _effectsManager.DrawCardEffect(owner, isStart);
 
         if (!isStart)
             _effectsManager.HideDrawCardEffect();
 
-        GameObject cardHand = Instantiate(CardPref, hand, false);
+        GameObject cardHand = Instantiate(CardPref, handTransform, false);
 
         ChoseCard choseCard = cardHand.AddComponent<ChoseCard>();
         _objectResolver.Inject(choseCard);
         choseCard.enabled = false;
 
-        if (hand == _enemyHand)
-        {
-            cardHand.GetComponent<CardInfoScript>().HideCardInfo(card);
-            EnemyState.Hand.Add(cardHand.GetComponent<CardInfoScript>());
-            _uiManager.CheckColorPointsCard(cardHand.GetComponent<CardInfoScript>());
-        }
+        var info = cardHand.GetComponent<CardInfoScript>();
 
-        else
+        if (owner == EffectOwner.Player)
         {
-            cardHand.GetComponent<CardInfoScript>().ShowCardInfo(card);
-            PlayerState.Hand.Add(cardHand.GetComponent<CardInfoScript>());
-            _uiManager.CheckColorPointsCard(cardHand.GetComponent<CardInfoScript>());
-
+            info.ShowCardInfo(card);
+            state.Hand.Add(info);
             Deck.Instance.DeleteFirstCardFromDeck();
         }
+        else
+        {
+            info.HideCardInfo(card);
+            state.Hand.Add(info);
+        }
+
+        _uiManager.CheckColorPointsCard(info);
 
         deck.RemoveAt(0);
-
         _uiManager.ChangeDeckCount(CurrentGame);
     }
 
@@ -255,9 +253,7 @@ public class GameManager : MonoBehaviour
                     yield return new WaitForSeconds(1);
 
                     if (_turnTime == 0 && !IsHandCardPlaying && PlayerState.Hand.Cards.Count != 0)
-                    {
                         ThrowCard(PlayerState.Hand.Cards[Random.Range(0, PlayerState.Hand.Cards.Count)], true);
-                    }
                 }
 
                 if (IsChooseCard == true)
@@ -265,16 +261,12 @@ public class GameManager : MonoBehaviour
                     _choosenCard = CardsCanChooseOnWickEnd[Random.Range(0, CardsCanChooseOnWickEnd.Count)];
                     yield return null;
                 }
-
             }
 
             StartCoroutine(ChangeTurn());
         }
-
         else
-        {
             AllCoroutine.Add(StartCoroutine(EnemyTurn(EnemyState.Hand.Cards)));
-        }
     }
 
     public void StartChangeTurn()
@@ -533,7 +525,7 @@ public class GameManager : MonoBehaviour
         _uiManager.ChangeEndTurnButtonInteractable(false);
 
         for (int i = 0; i < card.SelfCard.DrawCard.DrawCardCount; i++)
-            yield return GiveCardtoHand(CurrentGame.PlayerDeck, _playerHand, TimeDrawCard, true);
+            yield return GiveCardToHand(CurrentGame.PlayerDeck, EffectOwner.Player);
 
         _uiManager.ChangeEndTurnButtonInteractable(true);
     }
@@ -547,7 +539,7 @@ public class GameManager : MonoBehaviour
         {
             for (int i = 0; i < card.SelfCard.DrawCard.DrawCardCount; i++)
             {
-                yield return GiveCardtoHand(CurrentGame.EnemyDeck, _enemyHand, TimeDrawCard, false);
+                yield return GiveCardToHand(CurrentGame.EnemyDeck, EffectOwner.Enemy);
             }
         }
     }
@@ -815,13 +807,13 @@ public class GameManager : MonoBehaviour
 
         ResetPassState();
 
-        CurrentGame = new Game(this);
+        CurrentGame = new Game();
 
         Deck.Instance.DeleteDeck();
         Deck.Instance.CreateDeck(CurrentGame.PlayerDeck);
 
-        StartCoroutine(GiveHandCards(CurrentGame.EnemyDeck, _enemyHand, false));
-        StartCoroutine(GiveHandCards(CurrentGame.PlayerDeck, _playerHand, true));
+        StartCoroutine(GiveHandCards(CurrentGame.EnemyDeck, EffectOwner.Enemy, true));
+        StartCoroutine(GiveHandCards(CurrentGame.PlayerDeck, EffectOwner.Player, true));
 
         _uiManager.ChangeEndTurnButtonInteractable(true);
 

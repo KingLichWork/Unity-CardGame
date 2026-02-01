@@ -6,8 +6,6 @@ using VContainer;
 
 public class UIManager : MonoBehaviour
 {
-    [HideInInspector] public bool IsPause;
-
     [SerializeField] private EndGamePanel _endGamePanel;
 
     [SerializeField] private TextMeshProUGUI _playerPointsTMPro;
@@ -19,6 +17,9 @@ public class UIManager : MonoBehaviour
     [SerializeField] private Button _endTurnButton;
 
     [SerializeField] private LineRenderer _line;
+
+    private bool _isPause;
+    public bool IsPause => _isPause;
 
     private void OnEnable()
     {
@@ -59,8 +60,8 @@ public class UIManager : MonoBehaviour
 
     public void ChangeWick(int currentTime)
     {
-        _imageTurnTime[0].fillAmount = (float)currentTime / GameManager.Instance.TurnDuration;
-        _imageTurnTime[1].fillAmount = (float)currentTime / GameManager.Instance.TurnDuration;
+        _imageTurnTime[0].fillAmount = (float)currentTime / GameManager.TurnDuration;
+        _imageTurnTime[1].fillAmount = (float)currentTime / GameManager.TurnDuration;
     }
 
     public void ChangeLineColor(Color firstColor, Color secondColor)
@@ -86,42 +87,27 @@ public class UIManager : MonoBehaviour
 
     public void CheckTimer(CardInfoScript card)
     {
+        card.TimerObject.SetActive(card.SelfCard.EndTurnActions.Timer > 0);
+
         if (card.SelfCard.EndTurnActions.Timer > 0)
-        {
-            card.TimerObject.SetActive(true);
             card.TimerText.text = card.SelfCard.EndTurnActions.Timer.ToString();
-        }
-        else
-            card.TimerObject.SetActive(false);
     }
 
     public void CheckBleeding(CardInfoScript card)
     {
-        if (card.SelfCard.StatusEffects.SelfEnduranceOrBleeding < 0)
-        {
-            card.BleedingPanel.SetActive(true);
-            card.BleedingPanel.GetComponent<Image>().color = Color.red;
-            card.BleedingPanelText.text = (-card.SelfCard.StatusEffects.SelfEnduranceOrBleeding).ToString();
-        }
-        else if (card.SelfCard.StatusEffects.SelfEnduranceOrBleeding > 0)
-        {
-            card.BleedingPanel.SetActive(true);
-            card.BleedingPanel.GetComponent<Image>().color = Color.green;
-            card.BleedingPanelText.text = card.SelfCard.StatusEffects.SelfEnduranceOrBleeding.ToString();
-        }
-        else
-            card.BleedingPanel.SetActive(false);
+        int count = card.SelfCard.StatusEffects.SelfEnduranceOrBleeding;
+
+        card.BleedingPanel.SetActive(count != 0);
+        card.BleedingPanel.GetComponent<Image>().color = count < 0 ? Color.red : Color.green;
+        card.BleedingPanelText.text = count < 0 ? (-count).ToString() : count.ToString();
     }
 
     public void CheckArmor(CardInfoScript card)
     {
+        card.ArmorObject.SetActive(card.SelfCard.BaseCard.ArmorPoints > 0);
+
         if (card.SelfCard.BaseCard.ArmorPoints > 0)
-        {
-            card.ArmorObject.SetActive(true);
             card.ArmorPoints.text = card.SelfCard.BaseCard.ArmorPoints.ToString();
-        }
-        else
-            card.ArmorObject.SetActive(false);
     }
 
     public void EndGame(int playerPoints, int enemyPoint)
@@ -133,13 +119,13 @@ public class UIManager : MonoBehaviour
 
     public void Pause()
     {
-        IsPause = true;
+        _isPause = true;
         _endGamePanel.Pause();
     }
 
     public void UnPause()
     {
-        IsPause = false;
+        _isPause = false;
         _endGamePanel.Hide();
     }
 }

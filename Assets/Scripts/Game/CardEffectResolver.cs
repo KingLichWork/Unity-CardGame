@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System.Collections;
+using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using VContainer;
@@ -37,7 +38,7 @@ public class CardEffectResolver
         if (boost.NearBoost != -1)
             return;
 
-        var ally = GetOpponentState(owner);
+        var ally = GetOwnerState(owner);
 
         foreach (var target in ally.Field.Cards)
         {
@@ -353,6 +354,7 @@ public class CardEffectResolver
             }
         }
     }
+
     private PlayerState GetOwnerState(EffectOwner owner)
     {
         return owner == EffectOwner.Player

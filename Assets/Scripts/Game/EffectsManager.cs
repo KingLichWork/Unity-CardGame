@@ -1,6 +1,5 @@
 ﻿using DG.Tweening;
 using System.Collections;
-using System.Xml.Serialization;
 using Unity.Mathematics;
 using UnityEngine;
 
@@ -12,117 +11,76 @@ public class EffectsManager : MonoBehaviour
     public Material InvisibilityMaterial;
     public Material InvulnerabilityMaterial;
 
-    public GameObject CardBackPlayer;
-    public GameObject CardBackEnemy;
-    public Transform PlayerDeck;
-    public Transform EnemyDeck;
+    [SerializeField] private GameObject _cardBackPlayer;
+    [SerializeField] private GameObject _cardBackEnemy;
 
-    [HideInInspector] public int ParticleZCoordinate = 50;
-    [HideInInspector] public float ParticleTimeToMove = 0.4f;
-    [HideInInspector] public float ShaderChangePointsTime = 1f;
+    [SerializeField] private Transform _playerHand;
+    [SerializeField] private Transform _enemyHand;
+    [SerializeField] private Transform _playerDeck;
+    [SerializeField] private Transform _enemyDeck;
 
     [SerializeField] private ParticleSystem[] _damageParticle;
     [SerializeField] private ParticleSystem[] _damageBurstParticle;
-
     [SerializeField] private ParticleSystem[] _boostParticle;
     [SerializeField] private ParticleSystem[] _boostBurstParticle;
 
-    public void DrawCardEffect(float time, Transform Hand, bool isPlayer)
+    private float _particleTimeToMove = 0.4f;
+    private int _particleZCoordinate = 50;
+    private float _shaderChangePointsTime = 1f;
+    private float _timeDrawCardStart = 0.15f; 
+    private float _timeDrawCard = 0.3f;
+
+    public IEnumerator DrawCardEffect(EffectOwner isPlayer, bool isStartDraw)
     {
-        if (isPlayer)
-        {
-            CardBackPlayer.SetActive(true);
-            CardBackPlayer.transform.position = PlayerDeck.transform.position;
-            CardBackPlayer.transform.DOMove(Hand.position, time);
-        }
-        else
-        {
-            CardBackEnemy.SetActive(true);
-            CardBackEnemy.transform.position = EnemyDeck.transform.position;
-            CardBackEnemy.transform.DOMove(Hand.position, time);
-        }
+        float time = isStartDraw ? _timeDrawCardStart : _timeDrawCard;
+        GameObject cardBack = isPlayer == EffectOwner.Player ? _cardBackPlayer : _cardBackEnemy;
+
+        cardBack.SetActive(true);
+        cardBack.transform.position = isPlayer == EffectOwner.Player ? _playerDeck.transform.position : _enemyDeck.transform.position;
+        cardBack.transform.DOMove(isPlayer == EffectOwner.Player ? _playerHand.position : _enemyHand.position, time);
+
+        yield return new WaitForSeconds(time);
     }
 
     public void HideDrawCardEffect()
     {
-        CardBackPlayer.SetActive(false);
-        CardBackEnemy.SetActive(false);
+        _cardBackPlayer.SetActive(false);
+        _cardBackEnemy.SetActive(false);
     }
 
     public void StartParticleEffects(Transform start, Transform end, int value)
     {
-        if (value > 0)
-        {
-            if (start == end)
-                ParticleEffects(start, end, true, true);
-            else
-                ParticleEffects(start, end, true, false, true);
-        }
-        else
-        {
-            if (start == end)
-                ParticleEffects(start, end, false, true);
-            else
-                ParticleEffects(start, end, false, false, true);
-        }
+        ParticleEffects(start, end, value > 0, start == end , value > 0 && start != end);
     }
 
     private void ParticleEffects(Transform start, Transform end, bool isBoost, bool isSelf, bool isStartDelay = false)
     {
-        if (isBoost)
+        ParticleSystem[] mainParticles = isBoost ? _boostParticle : _damageParticle;
+        ParticleSystem[] burstParticles = isBoost ? _boostBurstParticle : _damageBurstParticle;
+
+        for (int i = 0; i < mainParticles.Length; i++)
         {
-            for (int i = 0; i < 9; i++)
+            if (!mainParticles[i].isPlaying)
             {
-                if (!_boostParticle[i].isPlaying)
+                if (!isSelf)
                 {
-                    if (!isSelf)
-                    {
+                    mainParticles[i].transform.position = new Vector3(start.position.x, start.position.y, _particleZCoordinate);
+                    mainParticles[i].Play();
+                    mainParticles[i].transform.DOMove(new Vector3(end.position.x, end.position.y, _particleZCoordinate), _particleTimeToMove);
 
-                        _boostParticle[i].transform.position = new Vector3(start.position.x, start.position.y, ParticleZCoordinate);
-                        _boostParticle[i].Play();
-                        _boostParticle[i].transform.DOMove(new Vector3(end.position.x, end.position.y, ParticleZCoordinate), ParticleTimeToMove);
+                    if (isStartDelay)
+                        burstParticles[i].startDelay = _particleTimeToMove;
 
-                        if (isStartDelay)
-                            _boostBurstParticle[i].startDelay = ParticleTimeToMove;
-                        _boostBurstParticle[i].transform.position = new Vector3(end.position.x, end.position.y, ParticleZCoordinate);
-                        _boostBurstParticle[i].Play();
-                        break;
-                    }
-                    else
-                    {
-                        _boostBurstParticle[i].transform.position = new Vector3(start.position.x, start.position.y, ParticleZCoordinate);
-                        _boostBurstParticle[i].Play();
-                        break;
-                    }
+                    burstParticles[i].transform.position = new Vector3(end.position.x, end.position.y, _particleZCoordinate);
+                    burstParticles[i].Play();
                 }
-            }
-        }
-
-        if (!isBoost)
-        {
-            for (int i = 0; i < 9; i++)
-            {
-                if (!_damageParticle[i].isPlaying)
+                else
                 {
-                    if (!isSelf)
-                    {
-                        _damageParticle[i].transform.position = new Vector3(start.position.x, start.position.y, ParticleZCoordinate);
-                        _damageParticle[i].Play();
-                        _damageParticle[i].transform.DOMove(new Vector3(end.position.x, end.position.y, ParticleZCoordinate), ParticleTimeToMove);
-
-                        if (isStartDelay)
-                            _damageBurstParticle[i].startDelay = ParticleTimeToMove;
-                        _damageBurstParticle[i].transform.position = new Vector3(end.position.x, end.position.y, ParticleZCoordinate);
-                        _damageBurstParticle[i].Play();
-                        break;
-                    }
-                    else
-                    {
-                        _damageBurstParticle[i].transform.position = new Vector3(start.position.x, start.position.y, ParticleZCoordinate);
-                        _damageBurstParticle[i].Play();
-                        break;
-                    }
+                    burstParticles[i].transform.position = new Vector3(start.position.x, start.position.y, _particleZCoordinate);
+                    burstParticles[i].Play();
                 }
+
+                break;
             }
         }
     }
@@ -138,16 +96,13 @@ public class EffectsManager : MonoBehaviour
 
     private IEnumerator ShaderEffect(CardInfoScript card, Color color, int value)
     {
-        yield return new WaitForSeconds(ParticleTimeToMove);
+        yield return new WaitForSeconds(_particleTimeToMove);
 
-        float damage = ShaderChangePointsTime;
+        float damage = _shaderChangePointsTime;
+
         card.Image.material.SetFloat("_Damage", damage);
         card.Image.material.SetColor("_Color", color);
-
-        if (math.abs(value) > 12)
-            card.Image.material.SetFloat("_Value", 0);
-        else
-            card.Image.material.SetFloat("_Value", math.abs(value));
+        card.Image.material.SetFloat("_Value", math.abs(value) > 12 ? 0 : math.abs(value));
 
         while (damage > 0)
         {
@@ -157,8 +112,6 @@ public class EffectsManager : MonoBehaviour
         }
 
         card.IsShaderActive = false;
-
-        yield break;
     }
 
     public void StartDestroyCoroutine(CardInfoScript card)
@@ -177,7 +130,7 @@ public class EffectsManager : MonoBehaviour
 
     private IEnumerator DestroyEffectsCoroutine(CardInfoScript card)
     {
-        yield return new WaitForSeconds(ParticleTimeToMove);
+        yield return new WaitForSeconds(_particleTimeToMove);
 
         float trashold = 0;
 
@@ -187,7 +140,5 @@ public class EffectsManager : MonoBehaviour
             card.DestroyImage.material.SetFloat("_Trashold", trashold);
             yield return new WaitForSeconds(0.05f);
         }
-
-        yield break;
     }
 }

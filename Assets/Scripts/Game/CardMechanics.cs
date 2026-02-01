@@ -276,7 +276,7 @@ public class CardMechanics
         _effectsManager.StartDestroyCoroutine(card);
 
         Object.Destroy(card.DescriptionObject);
-        Object.Destroy(card.gameObject, _effectsManager.ParticleTimeToMove + 1);
+        Object.Destroy(card.gameObject, 1.5f);
     }
 
     public void SwapPoints(CardInfoScript firstCard, CardInfoScript secondCard)
