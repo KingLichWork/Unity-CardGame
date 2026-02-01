@@ -9,28 +9,16 @@ public class SoundManager : MonoBehaviour
     [SerializeField] private AudioSource _endTurnAudioSource;
     [SerializeField] private AudioSource _timerAudioSource;
 
-    public void PlayerDeploymentSound(CardInfoScript card)
+    public void DeploymentSound(CardInfoScript card)
     {
         _deploymentPlayerAudioSource.clip = Resources.Load<AudioClip>("Sounds/Cards/Deployment/" + card.SelfCard.BaseCard.Name + Random.Range(0, 6));
         _deploymentPlayerAudioSource.Play();
     }
 
-    public void EnemyDeploymentSound(CardInfoScript card)
-    {
-        _deploymentEnemyAudioSource.clip = Resources.Load<AudioClip>("Sounds/Cards/Deployment/" + card.SelfCard.BaseCard.Name + Random.Range(0, 6));
-        _deploymentEnemyAudioSource.Play();
-    }
-
-    public void PlayerStartEffectSound(CardInfoScript card)
+    public void StartEffectSound(CardInfoScript card)
     {
         _startPlayerTargetAudioSource.clip = card.SelfCard.BaseCard.CardPlaySound;
         _startPlayerTargetAudioSource.Play();
-    }
-
-    public void EnemyStartEffectSound(CardInfoScript card)
-    {
-        _startEnemyTargetAudioSource.clip = card.SelfCard.BaseCard.CardPlaySound;
-        _startEnemyTargetAudioSource.Play();
     }
 
     public void EndTurnSound(CardInfoScript card)

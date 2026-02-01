@@ -92,7 +92,7 @@ public class GameManager : MonoBehaviour
 
     [Inject]
     private void Construct(IObjectResolver objectResolver, CardMechanics cardMechanics, UIManager uiManager, 
-        EffectsManager effectsManager, SoundManager soundManager,CardEffectResolver cardEffectResolver)
+        EffectsManager effectsManager, SoundManager soundManager, CardEffectResolver cardEffectResolver)
     {
         _objectResolver = objectResolver;
         _cardMechanics = cardMechanics;
@@ -368,9 +368,7 @@ public class GameManager : MonoBehaviour
 
     private IEnumerator EnemyDropCard(CardInfoScript card)
     {
-        yield return new WaitForSeconds(0.1f);
-
-        CardInfoScript botChoosedCard;
+        yield return new WaitForSeconds(0.3f);
 
         EnemyState.Hand.Remove(card);
 
@@ -393,229 +391,26 @@ public class GameManager : MonoBehaviour
         }
 
         _cardMechanics.CheckStatusEffects(card);
+        _soundManager.DeploymentSound(card);
 
-        _soundManager.EnemyDeploymentSound(card);
+        if (_cardEffectResolver.NeedBoostChoice(card))
+            _cardEffectResolver.ResolveBoostWithAutoTarget(card);
+        else
+            _cardEffectResolver.HandleBoost(card, EffectOwner.Enemy);
 
-        if (card.SelfCard.BoostOrDamage.NearBoost == -1)
-        {
-            for (int i = EnemyState.Field.Cards.Count - 1; i >= 0; i--)
-            {
-                _cardMechanics.Deployment(EnemyState.Field.Cards[i], card);
+        if (_cardEffectResolver.NeedDamageChoice(card))
+            _cardEffectResolver.ResolveDamageWithAutoTarget(card);
+        else
+            _cardEffectResolver.HandleDamage(card, EffectOwner.Enemy);
 
-                if (card.SelfCard.StatusEffects.EnduranceOrBleedingOther != 0 && !card.SelfCard.StatusEffects.IsEnemyTargetEnduranceOrBleeding)
-                {
-                    _cardMechanics.BleedingOrEndurance(card, EnemyState.Field.Cards[i]);
-                    _uiManager.CheckBleeding(EnemyState.Field.Cards[i]);
-                }
+        _cardEffectResolver.HandleSelf(card);
+        _cardEffectResolver.HandleSpawn(card);
 
-                if (card.SelfCard.EndTurnActions.ArmorOther > 0)
-                {
-                    EnemyState.Field.Cards[i].SelfCard.BaseCard.ArmorPoints += card.SelfCard.EndTurnActions.ArmorOther;
-                    _uiManager.CheckArmor(EnemyState.Field.Cards[i]);
-                }
-            }
+        yield return HandleEnemyDraw(card);
 
-            _soundManager.EnemyStartEffectSound(card);
-        }
+        _cardEffectResolver.ResolveEnemyUnique(card);
 
-
-        else if ((card.SelfCard.BoostOrDamage.Boost != 0) && (EnemyState.Field.Cards.Count != 1) && ((EnemyState.Field.Cards.Count - EnemyState.Field.InvulnerabilityCards.Count) > 0))
-        {
-            botChoosedCard = ChooseCard(false);
-            _cardMechanics.Deployment(botChoosedCard, card);
-
-            if (card.SelfCard.StatusEffects.IsShieldOther)
-            {
-                botChoosedCard.SelfCard.StatusEffects.IsSelfShielded = true;
-                _cardMechanics.CheckStatusEffects(botChoosedCard);
-            }
-
-            if (card.SelfCard.BoostOrDamage.NearBoost > 0)
-            {
-                botChoosedCard.CheckSiblingIndex();
-
-                if (_cardMechanics.ReturnNearCard(botChoosedCard, card.SelfCard.BoostOrDamage.NearBoost, true) != null)
-                {
-                    for (int i = 0; i < _cardMechanics.ReturnNearCard(botChoosedCard, card.SelfCard.BoostOrDamage.NearBoost, true).Count; i++)
-                    {
-                        _cardMechanics.Deployment(_cardMechanics.ReturnNearCard(botChoosedCard, card.SelfCard.BoostOrDamage.NearBoost, true)[i], card, i + 1);
-                    }
-                }
-
-                if (_cardMechanics.ReturnNearCard(botChoosedCard, card.SelfCard.BoostOrDamage.NearBoost, false) != null)
-                {
-                    for (int i = 0; i < _cardMechanics.ReturnNearCard(botChoosedCard, card.SelfCard.BoostOrDamage.NearBoost, false).Count; i++)
-                    {
-                        _cardMechanics.Deployment(_cardMechanics.ReturnNearCard(botChoosedCard, card.SelfCard.BoostOrDamage.NearBoost, false)[i], card, i + 1);
-                    }
-                }
-            }
-
-            _soundManager.EnemyStartEffectSound(card);
-        }
-
-        if (card.SelfCard.BoostOrDamage.NearDamage == -1)
-        {
-            for (int i = PlayerState.Field.Cards.Count - 1; i >= 0; i--)
-            {
-                _cardMechanics.Deployment(PlayerState.Field.Cards[i], card);
-
-                if (card.SelfCard.StatusEffects.IsStunOther)
-                {
-                    PlayerState.Field.Cards[i].SelfCard.StatusEffects.IsSelfStunned = true;
-                    _cardMechanics.CheckStatusEffects(PlayerState.Field.Cards[i]);
-                }
-
-                if (card.SelfCard.StatusEffects.EnduranceOrBleedingOther != 0 && card.SelfCard.StatusEffects.IsEnemyTargetEnduranceOrBleeding)
-                {
-                    _cardMechanics.BleedingOrEndurance(card, PlayerState.Field.Cards[i]);
-                }
-            }
-
-            _soundManager.EnemyStartEffectSound(card);
-        }
-
-        else if ((card.SelfCard.BoostOrDamage.Damage != 0) && (PlayerState.Field.Cards.Count != 0) && ((PlayerState.Field.Cards.Count - PlayerState.Field.InvulnerabilityCards.Count) > 0))
-        {
-            botChoosedCard = ChooseCard(false, false);
-            _cardMechanics.Deployment(botChoosedCard, card);
-
-            if (card.SelfCard.StatusEffects.IsStunOther)
-            {
-                botChoosedCard.SelfCard.StatusEffects.IsSelfStunned = true;
-                _cardMechanics.CheckStatusEffects(botChoosedCard);
-            }
-
-            if (card.SelfCard.BoostOrDamage.NearDamage > 0)
-            {
-                botChoosedCard.CheckSiblingIndex();
-
-                if (_cardMechanics.ReturnNearCard(botChoosedCard, card.SelfCard.BoostOrDamage.NearDamage, true) != null)
-                {
-                    for (int i = 0; i < _cardMechanics.ReturnNearCard(botChoosedCard, card.SelfCard.BoostOrDamage.NearDamage, true).Count; i++)
-                    {
-                        _cardMechanics.Deployment(_cardMechanics.ReturnNearCard(botChoosedCard, card.SelfCard.BoostOrDamage.NearDamage, true)[i], card, i + 1);
-
-                        if (card.SelfCard.StatusEffects.IsStunOther)
-                        {
-                            _cardMechanics.ReturnNearCard(botChoosedCard, card.SelfCard.BoostOrDamage.NearDamage, true)[i].SelfCard.StatusEffects.IsSelfStunned = true;
-                            _cardMechanics.CheckStatusEffects(_cardMechanics.ReturnNearCard(botChoosedCard, card.SelfCard.BoostOrDamage.NearDamage, true)[i]);
-                        }
-                    }
-                }
-
-                if (_cardMechanics.ReturnNearCard(botChoosedCard, card.SelfCard.BoostOrDamage.NearDamage, false) != null)
-                {
-                    for (int i = 0; i < _cardMechanics.ReturnNearCard(botChoosedCard, card.SelfCard.BoostOrDamage.NearDamage, false).Count; i++)
-                    {
-                        _cardMechanics.Deployment(_cardMechanics.ReturnNearCard(botChoosedCard, card.SelfCard.BoostOrDamage.NearDamage, false)[i], card, i + 1);
-
-                        if (card.SelfCard.StatusEffects.IsStunOther)
-                        {
-                            _cardMechanics.ReturnNearCard(botChoosedCard, card.SelfCard.BoostOrDamage.NearDamage, false)[i].SelfCard.StatusEffects.IsSelfStunned = true;
-                            _cardMechanics.CheckStatusEffects(_cardMechanics.ReturnNearCard(botChoosedCard, card.SelfCard.BoostOrDamage.NearDamage, false)[i]);
-                        }
-                    }
-                }
-            }
-
-            if (!card.SelfCard.BoostOrDamage.AddictionWithEnemyField)
-                _soundManager.EnemyStartEffectSound(card);
-        }
-
-        if ((card.SelfCard.BoostOrDamage.SelfBoost != 0 || card.SelfCard.BoostOrDamage.SelfDamage != 0) && ((!card.SelfCard.BoostOrDamage.AddictionWithAlliedField && !card.SelfCard.BoostOrDamage.AddictionWithEnemyField) ||
-           (card.SelfCard.BoostOrDamage.AddictionWithAlliedField && (EnemyState.Field.Cards.Count - EnemyState.Field.InvulnerabilityCards.Count != 1) ||
-           (card.SelfCard.BoostOrDamage.AddictionWithEnemyField && ((PlayerState.Field.Cards.Count - PlayerState.Field.InvulnerabilityCards.Count) > 0)))))
-        {
-            _cardMechanics.Self(card, card);
-            _soundManager.EnemyStartEffectSound(card);
-        }
-
-        if (card.SelfCard.Spawns.SpawnCardCount != 0 && (!card.SelfCard.BoostOrDamage.AddictionWithEnemyField) || 
-            (card.SelfCard.BoostOrDamage.AddictionWithEnemyField && PlayerState.Field.Cards.Count > 0))
-        {
-            _soundManager.EnemyStartEffectSound(card);
-            _cardMechanics.SpawnCard(card, false);
-            ChangeEnemyPoints();
-        }
-
-        if (card.SelfCard.DrawCard.DrawCardCount != 0)
-        {
-            for (int i = 0; i < card.SelfCard.DrawCard.DrawCardCount; i++)
-            {
-                yield return StartCoroutine(GiveCardtoHand(CurrentGame.EnemyDeck, _enemyHand, TimeDrawCard, false));
-            }
-        }
-
-        if ((card.SelfCard.UniqueMechanics.DestroyCardPoints != 0) && (PlayerState.Field.Cards.Count != 0) && ((PlayerState.Field.Cards.Count - PlayerState.Field.InvulnerabilityCards.Count) > 0))
-        {
-            if (card.SelfCard.UniqueMechanics.DestroyCardPoints == -1)
-            {
-                botChoosedCard = ChooseCard(false, false);
-                _cardMechanics.DestroyCard(botChoosedCard, card);
-            }
-
-            else
-            {
-                List<CardInfoScript> possibleCards = new List<CardInfoScript>();
-
-                foreach (CardInfoScript playerFieldCard in PlayerState.Field.Cards)
-                {
-                    if (playerFieldCard.SelfCard.BaseCard.Points <= card.SelfCard.UniqueMechanics.DestroyCardPoints && !playerFieldCard.SelfCard.StatusEffects.IsInvulnerability)
-                    {
-                        possibleCards.Add(playerFieldCard);
-                    }
-                }
-
-                if (possibleCards.Count > 0)
-                {
-                    botChoosedCard = possibleCards[Random.Range(0, possibleCards.Count - 1)];
-                    _cardMechanics.DestroyCard(botChoosedCard, card);
-                }
-            }
-        }
-
-        if (card.SelfCard.UniqueMechanics.SwapPoints)
-        {
-            if ((PlayerState.Field.Cards.Count != 0) && ((PlayerState.Field.Cards.Count - PlayerState.Field.InvulnerabilityCards.Count) > 0))
-            {
-                botChoosedCard = ChooseCard(false, false);
-                _cardMechanics.SwapPoints(card, botChoosedCard);
-            }
-
-            else if ((EnemyState.Field.Cards.Count != 1) && ((EnemyState.Field.Cards.Count - EnemyState.Field.InvulnerabilityCards.Count) > 0))
-            {
-                botChoosedCard = ChooseCard(false, true);
-                _cardMechanics.SwapPoints(card, botChoosedCard);
-            }
-        }
-
-        if (card.SelfCard.StatusEffects.EnduranceOrBleedingOther != 0)
-        {
-            if (card.SelfCard.StatusEffects.IsEnemyTargetEnduranceOrBleeding && card.SelfCard.BoostOrDamage.NearBoost != -1 && 
-                ((PlayerState.Field.Cards.Count - PlayerState.Field.InvulnerabilityCards.Count) > 0))
-            {
-                botChoosedCard = ChooseCard(false, false);
-                _cardMechanics.BleedingOrEndurance(card, botChoosedCard);
-                _uiManager.CheckBleeding(botChoosedCard);
-            }
-
-            else if (card.SelfCard.BoostOrDamage.NearDamage != -1 && (EnemyState.Field.Cards.Count - EnemyState.Field.InvulnerabilityCards.Count) > 1)
-            {
-                botChoosedCard = ChooseCard(false, true);
-                _cardMechanics.BleedingOrEndurance(card, botChoosedCard);
-                _uiManager.CheckBleeding(botChoosedCard);
-            }
-
-        }
-
-        if (card.SelfCard.UniqueMechanics.TransformationCardName != "")
-        {
-            _cardMechanics.Transformation(card);
-        }
-
-        ChangeEnemyPoints();
-        ChangePlayerPoints();
+        FinalPointsUpdate();
     }
 
     private void PlayerDropCardStartCoroutine(CardInfoScript card)
@@ -682,31 +477,23 @@ public class GameManager : MonoBehaviour
     private void OnCardPlaced(CardInfoScript card)
     {
         _cardMechanics.CheckStatusEffects(card);
-        _soundManager.PlayerDeploymentSound(card);
+        _soundManager.DeploymentSound(card);
 
         if (_cardEffectResolver.NeedBoostChoice(card))
         {
             PrepareToChoseCard(card, false);
-            AllCoroutine.Add(
-                StartCoroutine(ChoseCardCoroutine(card, isBoost: true))
-            );
+            AllCoroutine.Add(StartCoroutine(ChoseCardCoroutine(card, isBoost: true)));
         }
         else
-        {
-            _cardEffectResolver.HandleBoost(card);
-        }
+            _cardEffectResolver.HandleBoost(card, EffectOwner.Player);
 
         if (_cardEffectResolver.NeedDamageChoice(card))
         {
             PrepareToChoseCard(card, true);
-            AllCoroutine.Add(
-                StartCoroutine(ChoseCardCoroutine(card, isDamage: true))
-            );
+            AllCoroutine.Add(StartCoroutine(ChoseCardCoroutine(card, isDamage: true)));
         }
         else
-        {
-            _cardEffectResolver.HandleDamage(card);
-        }
+            _cardEffectResolver.HandleDamage(card, EffectOwner.Player);
 
         _cardEffectResolver.HandleSelf(card);
         _cardEffectResolver.HandleSpawn(card);
@@ -749,6 +536,20 @@ public class GameManager : MonoBehaviour
             yield return GiveCardtoHand(CurrentGame.PlayerDeck, _playerHand, TimeDrawCard, true);
 
         _uiManager.ChangeEndTurnButtonInteractable(true);
+    }
+
+    private IEnumerator HandleEnemyDraw(CardInfoScript card)
+    {
+        if (card.SelfCard.DrawCard.DrawCardCount == 0)
+            yield break;
+
+        if (card.SelfCard.DrawCard.DrawCardCount != 0)
+        {
+            for (int i = 0; i < card.SelfCard.DrawCard.DrawCardCount; i++)
+            {
+                yield return GiveCardtoHand(CurrentGame.EnemyDeck, _enemyHand, TimeDrawCard, false);
+            }
+        }
     }
 
     private void FinalPointsUpdate()
@@ -947,7 +748,7 @@ public class GameManager : MonoBehaviour
         ChangeEnemyPoints();
         ChangePlayerPoints();
 
-        _soundManager.PlayerStartEffectSound(playedCard);
+        _soundManager.StartEffectSound(playedCard);
     }
 
     private IEnumerator WaitForChoseCard(CardInfoScript card)
