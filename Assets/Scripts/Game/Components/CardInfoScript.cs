@@ -1,9 +1,10 @@
 ﻿using TMPro;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.UI;
 using VContainer;
 
-public class CardInfoScript : MonoBehaviour
+public class CardInfoScript : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
 {
     public Card SelfCard;
 
@@ -21,13 +22,6 @@ public class CardInfoScript : MonoBehaviour
     public GameObject StatusEffectPrefab;
     public Image CardStatusEffectImage;
 
-    public int SiblingIndex;
-    public bool IsHideCard;
-    public bool IsAnimationCard;
-    public bool IsOrderCard;
-    public bool IsDeckBuildCard;
-    public bool IsShaderActive;
-
     public TextMeshProUGUI Point;
     public TextMeshProUGUI Name;
     public TextMeshProUGUI SecondName;
@@ -42,6 +36,15 @@ public class CardInfoScript : MonoBehaviour
     public GameObject TimerObject;
     public TextMeshProUGUI TimerText;
 
+    [SerializeField] private ParticleSystem _selectParticles;
+
+    [HideInInspector] public int SiblingIndex;
+    [HideInInspector] public bool IsHideCard;
+    [HideInInspector] public bool IsAnimationCard;
+    [HideInInspector] public bool IsOrderCard;
+    [HideInInspector] public bool IsDeckBuildCard;
+    [HideInInspector] public bool IsShaderActive;
+
     [HideInInspector] public GameObject StatusEffectShield;
     [HideInInspector] public GameObject StatusEffectIllusion;
     [HideInInspector] public GameObject StatusEffectStunned;
@@ -54,6 +57,19 @@ public class CardInfoScript : MonoBehaviour
     private void Construct(LocalizationManager localizationManager)
     {
         _localizationManager = localizationManager;
+    }
+
+    public void OnPointerEnter(PointerEventData eventData)
+    {
+        ShowDescription();
+        _selectParticles.Play();
+    }
+
+    public void OnPointerExit(PointerEventData eventData)
+    {
+        HideDescription();
+        _selectParticles.Stop();
+        _selectParticles.Clear();
     }
 
     public int ShowPoints(Card card)
